@@ -1,0 +1,17 @@
+{
+	"name": "tftp-client",
+	"version": "0.0.0",
+	"description": "Streaming TFTP client",
+	"keywords": ["tftp", "client", "stream"],
+	"author": "Gabriel Llamas <gagle@outlook.com>",
+	"repository": "git://github.com/gagle/node-tftp-client.git",
+	"engines": {
+		"node": ">=0.10"
+	},
+	"dependencies": {
+		"argp": "*",
+		"binary-sort": "*"
+	},
+	"license": "MIT",
+	"main": "lib"
+}
