@@ -1,5 +1,5 @@
 {
-	"name": "tftp-client",
+	"name": "ntftp",
 	"version": "0.0.0",
 	"description": "Streaming TFTP client",
 	"keywords": ["tftp", "client", "stream"],
@@ -10,7 +10,10 @@
 	},
 	"dependencies": {
 		"argp": "*",
-		"binary-sort": "*"
+		"progress": "1.1.x"
+	},
+	"bin": {
+		"ntftp": "bin/ntftp.js"
 	},
 	"license": "MIT",
 	"main": "lib"
