@@ -9,8 +9,7 @@
 		"node": ">=0.10"
 	},
 	"dependencies": {
-		"argp": "*",
-		"progress": "1.1.x"
+		"argp": "*"
 	},
 	"bin": {
 		"ntftp": "bin/ntftp.js"
