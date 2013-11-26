@@ -8,9 +8,9 @@ var tftp = require ("../lib");
 
 var client;
 var rl;
-var gs;
-var local;
-var ps;
+var sigint;
+var read;
+var write;
 
 //The main parser is not cached
 require ("argp")
@@ -33,12 +33,10 @@ require ("argp")
 		.body ()
 				.text ("Once ntftp is running, it shows a prompt and recognizes the " +
 						"following commands:")
-				.text ("get [options] <remote> [<local>]", "  ")
-				.text ("Gets a file from the remote server", "    ")
-				.text ("\nput [options] <local> [<remote>]", "  ")
-				.text ("Puts a file to the remote server", "    ")
-				.text ("\nhelp <get|put>", "  ")
-				.text ("Prints help information about get or put commands", "    ")
+				.text ("> get <remote> [<local>]", "  ")
+				.text ("Gets a file from the remote server.", "    ")
+				.text ("\n> put <local> [<remote>]", "  ")
+				.text ("Puts a file to the remote server.", "    ")
 				.text ("\nTo quit the program press ctrl-c two times.")
 				
 				.text ("\nExample:")
@@ -86,8 +84,9 @@ function createCommandParser (){
 			.main ()
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
-					.on ("end", function (argv, fns){
-						fns.fail ("Invalid command.");
+					.on ("end", function (argv){
+						console.error ("Error: Invalid command.");
+						rl.prompt ();
 					})
 			.command ("get", { trailing: { min: 1, max: 2 } })
 					.allowUndefinedArguments ()
@@ -116,11 +115,30 @@ function createClient (argv){
 	});
 	
 	var timer;
+	var again = function (){
+		timer = setTimeout (function (){
+			timer = null;
+			sigint = false;
+		}, 3000);
+		
+		console.log ("\n(^C again to quit)");
+		rl.line = "";
+		rl.prompt ();
+	};
+	var completions = ["get ", "put "];
 	
 	//Start prompt
 	rl = readLine.createInterface ({
 		input: process.stdin,
-		output: process.stdout
+		output: process.stdout,
+		completer: function (line){
+			var lastWord = line.split (" ");
+			lastWord = lastWord[lastWord.length - 1];
+			var hits = completions.filter (function (command){
+				return command.indexOf (lastWord) === 0;
+			});
+			return [hits.length ? hits : [], lastWord];
+		}
 	});
 	rl.setPrompt ("> ", 2);
 	rl.on ("line", function (line){
@@ -130,59 +148,81 @@ function createClient (argv){
 		}));
 	});
 	rl.on ("SIGINT", function (){
-		if (timer){
-			//Abort the current transfer
-			if (gs){
-				gs.abort ();
-				fs.unlink (local, function (){
-					process.exit ();
-				});
-			}else if (ps){
-				ps.abort ();
-				process.exit ();
-			}else{
-				process.exit ();
-			}
-			return;
+		if (timer) process.exit ();
+		
+		sigint = true;
+		
+		//Abort the current transfer
+		if (read){
+			read.ws.on ("finish", function (){
+				var local = read.local;
+				read = null;
+				fs.unlink (local, again);
+			});
+			read.gs.abort ();
+		}else if (write){
+			
+		}else{
+			again ();
 		}
-		
-		timer = setTimeout (function (){
-			timer = null;
-		}, 3000);
-		
-		console.log ("\n(^C again to quit)");
-		rl.prompt ();
 	});
 	rl.prompt ();
 };
 
 function get (argv){
-	local = argv.get[1] || argv.get[0];
+	try{
+		client._checkRemote (argv.get[0]);
+	}catch (e){
+		console.error ("Error: " + e.message);
+		return rl.prompt ();
+	}
+
+	read = {};
+	read.local = argv.get[1] || argv.get[0];
 	
-	gs = client.createGetStream (argv.get[0]);
-	gs
+	var getError = false;
+	
+	read.ws = fs.createWriteStream (read.local)
 			.on ("error", function (error){
-				fs.unlink (local, function (){
-					console.error (error.message);
+				read.gs.on ("end", function (){
+					var local = read.local;
+					read = null;
+					fs.unlink (local, function (){
+						console.error ("Error: " + error.message);
+						rl.prompt ();
+					});
+				});
+				read.gs.abort ();
+			})
+			.on ("finish", function (){
+				//If sigint, the current transfer has been aborted and the finish event
+				//is handled in another place
+				//If getError, the get stream has failed and automatically closes the
+				//underlying stream
+				if (sigint || getError) return;
+				read = null;
+				rl.prompt ();
+			});
+	
+	read.gs = client.createGetStream (argv.get[0]);
+	read.gs
+			.on ("error", function (error){
+				fs.unlink (read.local, function (){
+					getError = true;
+					read.ws.end ();
+					read = null;
+					console.error ("Error: " + error.message);
+					rl.prompt ();
 				});
 			})
 			.on ("progress", function (progress){
 				//TODO
 			})
-			.pipe (fs.createWriteStream (local))
-			.on ("error", function (error){
-				gs.abort ();
-				fs.unlink (local, function (){
-					console.error (error.message);
-				});
-			})
-			.on ("finish", function (){
-				gs = null;
-				local = null;
-				rl.prompt ();
-			});
+			.pipe (read.ws);
 };
 
 function put (argv){
+	write = {};
+	
 	
 };
