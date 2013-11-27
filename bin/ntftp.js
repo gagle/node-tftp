@@ -108,7 +108,7 @@ function createClient (argv){
 	client = tftp.createClient ({
 		hostname: argv.server.address,
 		port: argv.server.port,
-		blockSize: argv.blkize,
+		blockSize: argv.blksize,
 		retries: argv.retries,
 		timeout: argv.timeout,
 		windowSize: argv.windowsize
