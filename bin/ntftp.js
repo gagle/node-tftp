@@ -132,12 +132,10 @@ function createClient (argv){
 		input: process.stdin,
 		output: process.stdout,
 		completer: function (line){
-			var lastWord = line.split (" ");
-			lastWord = lastWord[lastWord.length - 1];
 			var hits = completions.filter (function (command){
-				return command.indexOf (lastWord) === 0;
+				return command.indexOf (line) === 0;
 			});
-			return [hits.length ? hits : [], lastWord];
+			return [hits.length ? hits : [], line];
 		}
 	});
 	rl.setPrompt ("> ", 2);
