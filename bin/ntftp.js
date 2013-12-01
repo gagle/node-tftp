@@ -5,6 +5,7 @@
 var fs = require ("fs");
 var readLine = require ("readline");
 var tftp = require ("../lib");
+var argp = require ("argp");
 
 var client;
 var rl;
@@ -13,12 +14,12 @@ var read;
 var write;
 
 //The main parser is not cached
-require ("argp")
+argp.createParser ()
 		.readPackage (__dirname + "/../package.json")
 		.usages (["ntftp <host>[:<port>] [options]"])
 		.allowUndefinedArguments ()
 		.on ("argument", function (argv, argument, ignore){
-			if (argv.server) this.fail ("Too many arguments.");
+			if (argv.server) this.fail ("Too many arguments");
 			argument = argument.split (":");
 			argv.server = {
 				address: argument[0],
@@ -26,10 +27,14 @@ require ("argp")
 			};
 			ignore ();
 		})
-		.on ("end", function (argv, fns){
-			if (!argv.server) fns.fail ("Missing server address.");
+		.on ("end", function (argv){
+			if (!argv.server) this.fail ("Missing server address");
 			createClient (argv);
 		})
+		.footer ("By default this client sends some option extensions trying to" +
+						"achieve the best performance. If the remote server doesn't " +
+						"support option extensions, it automatically fallbacks to a pure " +
+						"RFC 1350 compliant TFTP client implementation.")
 		.body ()
 				.text ("Once ntftp is running, it shows a prompt and recognizes the " +
 						"following commands:")
@@ -65,43 +70,39 @@ require ("argp")
 						type: Number, description: "Sets the windowsize option " +
 						"extension. Valid range: [1, 65535]. Default is 64"})
 				
-				.text ("\nBy default this client sends some option extensions trying " +
-						"to achieve the best performance. If the remote server doesn't " +
-						"support option extensions, it automatically fallbacks to a pure " +
-						"RFC 1350 compliant TFTP implementation.\n")
+				.help ()
+				.argv ();
 				
-				.help ();
-
-require ("argp").argv ();
+var notifyError = function (str){
+	console.error ("Error: " + str);
+	rl.prompt ();
+};
 
 function createCommandParser (){
-	//The command parser is cached, it is reused
-	var argp = require ("argp");
-	
 	//Don't produce errors when undefined arguments and options are
 	//introduced, they are simply omitted
-	argp
+	return argp.createParser ()
 			.main ()
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
-					.on ("end", function (argv){
-						console.error ("Error: Invalid command.");
-						rl.prompt ();
+					.on ("end", function (){
+						notifyError ("Invalid command");
 					})
+					.on ("error", notifyError)
 			.command ("get", { trailing: { min: 1, max: 2 } })
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
 					.on ("end", get)
+					.on ("error", notifyError)
 			.command ("put", { trailing: { min: 1, max: 2 } })
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
-					.on ("end", put);
-			
-	return argp;
+					.on ("end", put)
+					.on ("error", notifyError);
 };
 
 function createClient (argv){
-	var parser = createCommandParser ();
+	var p = createCommandParser ();
 
 	//Default values are not checked in the cli layer. If they are not valid they
 	//are set to their default values silently
@@ -171,8 +172,7 @@ function get (argv){
 	try{
 		client._checkRemote (argv.get[0]);
 	}catch (e){
-		console.error ("Error: " + e.message);
-		return rl.prompt ();
+		return notifyError (e.message);
 	}
 
 	read = {};
@@ -186,8 +186,7 @@ function get (argv){
 					var local = read.local;
 					read = null;
 					fs.unlink (local, function (){
-						console.error ("Error: " + error.message);
-						rl.prompt ();
+						notifyError (error.message);
 					});
 				});
 				read.gs.abort ();
@@ -209,8 +208,7 @@ function get (argv){
 					getError = true;
 					read.ws.end ();
 					read = null;
-					console.error ("Error: " + error.message);
-					rl.prompt ();
+					notifyError (error.message);
 				});
 			})
 			.on ("progress", function (progress){
