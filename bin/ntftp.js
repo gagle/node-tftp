@@ -16,7 +16,7 @@ var write;
 //The main parser is not cached
 argp.createParser ()
 		.readPackage (__dirname + "/../package.json")
-		.usages (["ntftp <host>[:<port>] [options]"])
+		.usages (["ntftp [options] <host>[:<port>]"])
 		.allowUndefinedArguments ()
 		.on ("argument", function (argv, argument, ignore){
 			if (argv.server) this.fail ("Too many arguments");
@@ -31,10 +31,10 @@ argp.createParser ()
 			if (!argv.server) this.fail ("Missing server address");
 			createClient (argv);
 		})
-		.footer ("By default this client sends some option extensions trying to" +
-						"achieve the best performance. If the remote server doesn't " +
-						"support option extensions, it automatically fallbacks to a pure " +
-						"RFC 1350 compliant TFTP client implementation.")
+		.footer ("By default this client sends some known option extensions " +
+						"trying to achieve the best performance. If the remote server " +
+						"doesn't support option extensions, it automatically fallbacks " +
+						"to a pure RFC 1350 compliant TFTP client implementation.")
 		.body ()
 				.text ("Once ntftp is running, it shows a prompt and recognizes the " +
 						"following commands:")
@@ -73,7 +73,7 @@ argp.createParser ()
 				.help ()
 				.argv ();
 				
-var notifyError = function (str){
+function notifyError (str){
 	console.error ("Error: " + str);
 	rl.prompt ();
 };
@@ -88,21 +88,27 @@ function createCommandParser (){
 					.on ("end", function (){
 						notifyError ("Invalid command");
 					})
-					.on ("error", notifyError)
+					.on ("error", function (error){
+						notifyError (error.message);
+					})
 			.command ("get", { trailing: { min: 1, max: 2 } })
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
 					.on ("end", get)
-					.on ("error", notifyError)
+					.on ("error", function (error){
+						notifyError (error.message);
+					})
 			.command ("put", { trailing: { min: 1, max: 2 } })
 					.allowUndefinedArguments ()
 					.allowUndefinedOptions ()
 					.on ("end", put)
-					.on ("error", notifyError);
+					.on ("error", function (error){
+						notifyError (error.message);
+					});
 };
 
 function createClient (argv){
-	var p = createCommandParser ();
+	var parser = createCommandParser ();
 
 	//Default values are not checked in the cli layer. If they are not valid they
 	//are set to their default values silently
@@ -174,47 +180,57 @@ function get (argv){
 	}catch (e){
 		return notifyError (e.message);
 	}
-
-	read = {};
-	read.local = argv.get[1] || argv.get[0];
 	
-	var getError = false;
+	var local = argv.get[1] || argv.get[0];
 	
-	read.ws = fs.createWriteStream (read.local)
-			.on ("error", function (error){
-				read.gs.on ("end", function (){
-					var local = read.local;
+	//Check if local is a dir and prevent to start a request
+	fs.stat (local, function (error, stats){
+		if (error){
+			if (error.code !== "ENOENT") return notifyError (error.message);
+		}else if (stats.isDirectory ()){
+			return notifyError ("The local file is a directory");
+		}
+		
+		read = {};
+		read.local = local;
+		
+		var getError = false;
+		
+		read.ws = fs.createWriteStream (read.local)
+				.on ("error", function (error){
+					read.gs.on ("end", function (){
+						read = null;
+						fs.unlink (local, function (){
+							notifyError (error.message);
+						});
+					});
+					read.gs.abort ();
+				})
+				.on ("finish", function (){
+					//If sigint, the current transfer has been aborted and the finish
+					//event is handled in another place
+					//If getError, the get stream has failed and automatically closes the
+					//underlying stream
+					if (sigint || getError) return;
 					read = null;
-					fs.unlink (local, function (){
+					rl.prompt ();
+				});
+		
+		read.gs = client.createGetStream (argv.get[0]);
+		read.gs
+				.on ("error", function (error){
+					fs.unlink (read.local, function (){
+						getError = true;
+						read.ws.end ();
+						read = null;
 						notifyError (error.message);
 					});
-				});
-				read.gs.abort ();
-			})
-			.on ("finish", function (){
-				//If sigint, the current transfer has been aborted and the finish event
-				//is handled in another place
-				//If getError, the get stream has failed and automatically closes the
-				//underlying stream
-				if (sigint || getError) return;
-				read = null;
-				rl.prompt ();
-			});
-	
-	read.gs = client.createGetStream (argv.get[0]);
-	read.gs
-			.on ("error", function (error){
-				fs.unlink (read.local, function (){
-					getError = true;
-					read.ws.end ();
-					read = null;
-					notifyError (error.message);
-				});
-			})
-			.on ("progress", function (progress){
-				//TODO
-			})
-			.pipe (read.ws);
+				})
+				.on ("progress", function (progress){
+					//TODO
+				})
+				.pipe (read.ws);
+	});
 };
 
 function put (argv){
