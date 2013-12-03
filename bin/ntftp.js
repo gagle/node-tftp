@@ -4,12 +4,12 @@
 
 var fs = require ("fs");
 var readLine = require ("readline");
-var tftp = require ("../lib");
+var ntftp = require ("../lib");
 var argp = require ("argp");
 
 var client;
 var rl;
-var sigint;
+var timer;
 var read;
 var write;
 
@@ -78,6 +78,17 @@ function notifyError (str){
 	rl.prompt ();
 };
 
+var again = function (){
+	timer = setTimeout (function (){
+		timer = null;
+		sigint = false;
+	}, 3000);
+	
+	console.log ("\n(^C again to quit)");
+	rl.line = "";
+	rl.prompt ();
+};
+
 function createCommandParser (){
 	//Don't produce errors when undefined arguments and options are
 	//introduced, they are simply omitted
@@ -112,7 +123,7 @@ function createClient (argv){
 
 	//Default values are not checked in the cli layer. If they are not valid they
 	//are set to their default values silently
-	client = tftp.createClient ({
+	client = ntftp.createClient ({
 		hostname: argv.server.address,
 		port: argv.server.port,
 		blockSize: argv.blksize,
@@ -121,17 +132,6 @@ function createClient (argv){
 		windowSize: argv.windowsize
 	});
 	
-	var timer;
-	var again = function (){
-		timer = setTimeout (function (){
-			timer = null;
-			sigint = false;
-		}, 3000);
-		
-		console.log ("\n(^C again to quit)");
-		rl.line = "";
-		rl.prompt ();
-	};
 	var completions = ["get ", "put "];
 	
 	//Start prompt
@@ -155,15 +155,8 @@ function createClient (argv){
 	rl.on ("SIGINT", function (){
 		if (timer) process.exit ();
 		
-		sigint = true;
-		
 		//Abort the current transfer
 		if (read){
-			read.ws.on ("finish", function (){
-				var local = read.local;
-				read = null;
-				fs.unlink (local, again);
-			});
 			read.gs.abort ();
 		}else if (write){
 			
@@ -183,7 +176,7 @@ function get (argv){
 	
 	var local = argv.get[1] || argv.get[0];
 	
-	//Check if local is a dir and prevent to start a request
+	//Check if local is a dir and prevent from starting a request
 	fs.stat (local, function (error, stats){
 		if (error){
 			if (error.code !== "ENOENT") return notifyError (error.message);
@@ -194,11 +187,9 @@ function get (argv){
 		read = {};
 		read.local = local;
 		
-		var getError = false;
-		
 		read.ws = fs.createWriteStream (read.local)
 				.on ("error", function (error){
-					read.gs.on ("end", function (){
+					read.gs.on ("abort", function (){
 						read = null;
 						fs.unlink (local, function (){
 							notifyError (error.message);
@@ -207,11 +198,6 @@ function get (argv){
 					read.gs.abort ();
 				})
 				.on ("finish", function (){
-					//If sigint, the current transfer has been aborted and the finish
-					//event is handled in another place
-					//If getError, the get stream has failed and automatically closes the
-					//underlying stream
-					if (sigint || getError) return;
 					read = null;
 					rl.prompt ();
 				});
@@ -219,15 +205,24 @@ function get (argv){
 		read.gs = client.createGetStream (argv.get[0]);
 		read.gs
 				.on ("error", function (error){
-					fs.unlink (read.local, function (){
-						getError = true;
-						read.ws.end ();
-						read = null;
-						notifyError (error.message);
+					read.ws.on ("close", function (){
+						fs.unlink (read.local, function (){
+							read = null;
+							notifyError (error.message);
+						});
 					});
+					read.ws.destroy ();
 				})
 				.on ("progress", function (progress){
 					//TODO
+				})
+				.on ("abort", function (){
+					read.ws.on ("close", function (){
+						var local = read.local;
+						read = null;
+						fs.unlink (local, again);
+					});
+					read.ws.destroy ();
 				})
 				.pipe (read.ws);
 	});
