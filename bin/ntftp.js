@@ -81,7 +81,6 @@ function notifyError (str){
 var again = function (){
 	timer = setTimeout (function (){
 		timer = null;
-		sigint = false;
 	}, 3000);
 	
 	console.log ("\n(^C again to quit)");

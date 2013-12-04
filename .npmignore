@@ -1,3 +1,15 @@
 CHANGES
 examples
 .npmignore
+
+node_modules
+client
+Serva
+server
+tftpd64.400
+notas
+t.js
+t2.js
+t3.js
+random.js
+compare.js
