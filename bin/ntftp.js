@@ -6,6 +6,7 @@ var fs = require ("fs");
 var readLine = require ("readline");
 var ntftp = require ("../lib");
 var argp = require ("argp");
+var statusBar = require ("../lib/status-bar");
 
 var client;
 var rl;
@@ -144,7 +145,6 @@ function createClient (argv){
 			return [hits.length ? hits : [], line];
 		}
 	});
-	rl.setPrompt ("> ", 2);
 	rl.on ("line", function (line){
 		if (!line) return rl.prompt ();
 		parser.argv (line.split (" ").filter (function (word){
@@ -167,6 +167,9 @@ function createClient (argv){
 };
 
 function get (argv){
+	clearTimeout (timer);
+	timer = null;
+
 	try{
 		client._checkRemote (argv.get[0]);
 	}catch (e){
@@ -188,6 +191,8 @@ function get (argv){
 		
 		read.ws = fs.createWriteStream (read.local)
 				.on ("error", function (error){
+					bar.clearInterval ();
+					console.log ();
 					read.gs.on ("abort", function (){
 						read = null;
 						fs.unlink (local, function (){
@@ -198,12 +203,28 @@ function get (argv){
 				})
 				.on ("finish", function (){
 					read = null;
+					console.log ();
 					rl.prompt ();
 				});
+				
+		var bar;
+		//80 - 59
+		var filenameMaxLength = 21;
+		var filename = argv.get[0];
+		if (filename.length > filenameMaxLength){
+			filename = filename.slice (0, filenameMaxLength - 3) + "...";
+		}else{
+			var remaining = filenameMaxLength - filename.length;
+			while (remaining--){
+				filename += " ";
+			}
+		}
 		
 		read.gs = client.createGetStream (argv.get[0]);
 		read.gs
 				.on ("error", function (error){
+					bar.clearInterval ();
+					console.log ();
 					read.ws.on ("close", function (){
 						fs.unlink (read.local, function (){
 							read = null;
@@ -212,10 +233,9 @@ function get (argv){
 					});
 					read.ws.destroy ();
 				})
-				.on ("progress", function (progress){
-					//TODO
-				})
 				.on ("abort", function (){
+					bar.clearInterval ();
+					console.log ();
 					read.ws.on ("close", function (){
 						var local = read.local;
 						read = null;
@@ -223,11 +243,29 @@ function get (argv){
 					});
 					read.ws.destroy ();
 				})
+				.on ("size", function (size){
+					bar = statusBar.create ({
+						total: size,
+						frequency: 200
+					});
+					bar.write = function (){
+						process.stdout.write (filename + " " + this.stats.size + " " +
+								this.stats.speed + " " + this.stats.eta + " [" +
+								this.stats.progress + "] " + this.stats.percentage);
+						process.stdout.cursorTo (0);
+					};
+				})
+				.on ("progress", function (chunkLength){
+					bar.update (chunkLength);
+				})
 				.pipe (read.ws);
 	});
 };
 
 function put (argv){
+	clearTimeout (timer);
+	timer = null;
+	
 	write = {};
 	
 	
