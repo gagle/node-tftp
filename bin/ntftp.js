@@ -166,6 +166,20 @@ function createClient (argv){
 	rl.prompt ();
 };
 
+function formatFilename (filename){
+	//80 - 59
+	var filenameMaxLength = 21;
+	if (filename.length > filenameMaxLength){
+		filename = filename.slice (0, filenameMaxLength - 3) + "...";
+	}else{
+		var remaining = filenameMaxLength - filename.length;
+		while (remaining--){
+			filename += " ";
+		}
+	}
+	return filename;
+};
+
 function get (argv){
 	clearTimeout (timer);
 	timer = null;
@@ -208,17 +222,7 @@ function get (argv){
 				});
 				
 		var bar;
-		//80 - 59
-		var filenameMaxLength = 21;
-		var filename = argv.get[0];
-		if (filename.length > filenameMaxLength){
-			filename = filename.slice (0, filenameMaxLength - 3) + "...";
-		}else{
-			var remaining = filenameMaxLength - filename.length;
-			while (remaining--){
-				filename += " ";
-			}
-		}
+		var filename = formatFilename (argv.get[0]);
 		
 		read.gs = client.createGetStream (argv.get[0]);
 		read.gs
