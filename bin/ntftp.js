@@ -6,7 +6,7 @@ var fs = require ("fs");
 var readLine = require ("readline");
 var ntftp = require ("../lib");
 var argp = require ("argp");
-var statusBar = require ("../lib/status-bar");
+var statusBar = require ("status-bar");
 
 var client;
 var rl;
@@ -239,7 +239,6 @@ function get (argv){
 				})
 				.on ("abort", function (){
 					bar.clearInterval ();
-					console.log ();
 					read.ws.on ("close", function (){
 						var local = read.local;
 						read = null;
@@ -250,17 +249,15 @@ function get (argv){
 				.on ("size", function (size){
 					bar = statusBar.create ({
 						total: size,
-						frequency: 200
+						frequency: 200,
+						write: function (){
+							process.stdout.write (filename + " " + this.stats.size + " " +
+									this.stats.speed + " " + this.stats.eta + " [" +
+									this.stats.progress + "] " + this.stats.percentage);
+							process.stdout.cursorTo (0);
+						}
 					});
-					bar.write = function (){
-						process.stdout.write (filename + " " + this.stats.size + " " +
-								this.stats.speed + " " + this.stats.eta + " [" +
-								this.stats.progress + "] " + this.stats.percentage);
-						process.stdout.cursorTo (0);
-					};
-				})
-				.on ("progress", function (chunkLength){
-					bar.update (chunkLength);
+					this.pipe (bar);
 				})
 				.pipe (read.ws);
 	});
