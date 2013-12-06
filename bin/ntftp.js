@@ -4,9 +4,9 @@
 
 var fs = require ("fs");
 var readLine = require ("readline");
-var ntftp = require ("../lib");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
+var ntftp = require ("../lib");
 
 var client;
 var rl;

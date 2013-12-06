@@ -9,7 +9,7 @@
 		"node": ">=0.10"
 	},
 	"dependencies": {
-		"argp": "1.x.x",
+		"argp": "1.0.x",
 		"status-bar": "0.0.x"
 	},
 	"bin": {
