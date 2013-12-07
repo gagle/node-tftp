@@ -205,8 +205,11 @@ function get (argv){
     
     read.ws = fs.createWriteStream (read.local)
         .on ("error", function (error){
-          bar.clearInterval ();
+          if (bar) bar.clearInterval ();
+          clearInterval (noExtensionsTimer);
+          
           console.log ();
+          
           read.gs.on ("abort", function (){
             read = null;
             fs.unlink (local, function (){
@@ -217,19 +220,23 @@ function get (argv){
         })
         .on ("finish", function (){
           read = null;
+          clearInterval (noExtensionsTimer);
           console.log ();
           rl.prompt ();
         });
         
     var bar;
     var filename = formatFilename (argv.get[0]);
-    var extensions = true;
+    var noExtensionsTimer = null;
     
     read.gs = client.createGetStream (argv.get[0]);
     read.gs
         .on ("error", function (error){
-          bar.clearInterval ();
+          if (bar) bar.clearInterval ();
+          clearInterval (noExtensionsTimer);
+          
           console.log ();
+          
           read.ws.on ("close", function (){
             fs.unlink (read.local, function (){
               read = null;
@@ -239,7 +246,9 @@ function get (argv){
           read.ws.destroy ();
         })
         .on ("abort", function (){
-          bar.clearInterval ();
+          if (bar) bar.clearInterval ();
+          clearInterval (noExtensionsTimer);
+          
           read.ws.on ("close", function (){
             var local = read.local;
             read = null;
@@ -248,7 +257,14 @@ function get (argv){
           read.ws.destroy ();
         })
         .on ("no-extensions", function (){
-          process.stdout.write ("no extensions");
+          var dots = "...";
+          var i = 1;
+          noExtensionsTimer = setInterval (function (){
+            i = i%4;
+            process.stdout.clearLine ();
+            process.stdout.cursorTo (0);
+            process.stdout.write (dots.slice (0, i++));
+          }, 200);
         })
         .on ("size", function (size){
           bar = statusBar.create ({
