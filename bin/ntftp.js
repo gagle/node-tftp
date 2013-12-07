@@ -223,6 +223,7 @@ function get (argv){
         
     var bar;
     var filename = formatFilename (argv.get[0]);
+    var extensions = true;
     
     read.gs = client.createGetStream (argv.get[0]);
     read.gs
@@ -245,6 +246,9 @@ function get (argv){
             fs.unlink (local, again);
           });
           read.ws.destroy ();
+        })
+        .on ("no-extensions", function (){
+          process.stdout.write ("no extensions");
         })
         .on ("size", function (size){
           bar = statusBar.create ({
