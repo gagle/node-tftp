@@ -2,7 +2,11 @@
   "name": "ntftp",
   "version": "0.0.0",
   "description": "Streaming TFTP client",
-  "keywords": ["tftp", "client", "stream"],
+  "keywords": [
+    "tftp",
+    "client",
+    "stream"
+  ],
   "author": "Gabriel Llamas <gagle@outlook.com>",
   "repository": "git://github.com/gagle/node-tftp-client.git",
   "engines": {
@@ -10,7 +14,8 @@
   },
   "dependencies": {
     "argp": "1.0.x",
-    "status-bar": "0.0.x"
+    "status-bar": "0.0.x",
+    "hex": "0.0.1"
   },
   "bin": {
     "ntftp": "bin/ntftp.js"
