@@ -1,20 +1,20 @@
 {
-	"name": "ntftp",
-	"version": "0.0.0",
-	"description": "Streaming TFTP client",
-	"keywords": ["tftp", "client", "stream"],
-	"author": "Gabriel Llamas <gagle@outlook.com>",
-	"repository": "git://github.com/gagle/node-tftp-client.git",
-	"engines": {
-		"node": ">=0.10"
-	},
-	"dependencies": {
-		"argp": "1.0.x",
-		"status-bar": "0.0.x"
-	},
-	"bin": {
-		"ntftp": "bin/ntftp.js"
-	},
-	"license": "MIT",
-	"main": "lib"
+  "name": "ntftp",
+  "version": "0.0.0",
+  "description": "Streaming TFTP client",
+  "keywords": ["tftp", "client", "stream"],
+  "author": "Gabriel Llamas <gagle@outlook.com>",
+  "repository": "git://github.com/gagle/node-tftp-client.git",
+  "engines": {
+    "node": ">=0.10"
+  },
+  "dependencies": {
+    "argp": "1.0.x",
+    "status-bar": "0.0.x"
+  },
+  "bin": {
+    "ntftp": "bin/ntftp.js"
+  },
+  "license": "MIT",
+  "main": "lib"
 }
