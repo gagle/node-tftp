@@ -200,22 +200,14 @@ function get (argv){
       return notifyError ("The local file is a directory");
     }
     
+    var started;
+    
     read = {};
     read.local = local;
     
     read.ws = fs.createWriteStream (read.local)
         .on ("error", function (error){
-          if (bar) bar.clearInterval ();
-          clearInterval (noExtensionsTimer);
-          
-          console.log ();
-          
-          read.gs.on ("abort", function (){
-            read = null;
-            fs.unlink (local, function (){
-              notifyError (error.message);
-            });
-          });
+          read.error = error;
           read.gs.abort ();
         })
         .on ("finish", function (){
@@ -249,35 +241,52 @@ function get (argv){
           if (bar) bar.clearInterval ();
           clearInterval (noExtensionsTimer);
           
-          read.ws.on ("close", function (){
-            var local = read.local;
-            read = null;
-            fs.unlink (local, again);
-          });
-          read.ws.destroy ();
+          var local = read.local;
+          var error = read.error;
+          read = null;
+          
+          if (error){
+            //Error from the ws
+            if (started) console.log ();
+            
+            fs.unlink (local, function (){
+              notifyError (error.message);
+            });
+          }else{
+            read.ws.on ("close", function (){
+              var local = read.local;
+              read = null;
+              fs.unlink (local, again);
+            });
+            read.ws.destroy ();
+          }
         })
-        .on ("no-extensions", function (){
-          var dots = "...";
-          var i = 1;
-          noExtensionsTimer = setInterval (function (){
-            i = i%4;
-            process.stdout.clearLine ();
-            process.stdout.cursorTo (0);
-            process.stdout.write (dots.slice (0, i++));
-          }, 200);
-        })
-        .on ("size", function (size){
-          bar = statusBar.create ({
-            total: size,
-            frequency: 200,
-            write: function (){
-              process.stdout.write (filename + " " + this.stats.size + " " +
-                  this.stats.speed + " " + this.stats.eta + " [" +
-                  this.stats.progress + "] " + this.stats.percentage);
+        .on ("stats", function (stats){
+          started = true;
+          
+          if (stats){
+            bar = statusBar.create ({
+              total: stats.size,
+              frequency: 200,
+              write: function (){
+                process.stdout.write (filename + " " + this.stats.size + " " +
+                    this.stats.speed + " " + this.stats.eta + " [" +
+                    this.stats.progress + "] " + this.stats.percentage);
+                process.stdout.cursorTo (0);
+              }
+            });
+            this.pipe (bar);
+          }else{
+            //No extensions
+            var dots = "...";
+            var i = 1;
+            noExtensionsTimer = setInterval (function (){
+              i = i%4;
+              process.stdout.clearLine ();
               process.stdout.cursorTo (0);
-            }
-          });
-          this.pipe (bar);
+              process.stdout.write (dots.slice (0, i++));
+            }, 200);
+          }
         })
         .pipe (read.ws);
   });
