@@ -3,6 +3,7 @@
 "use strict";
 
 var fs = require ("fs");
+var path = require ("path");
 var readLine = require ("readline");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
@@ -13,6 +14,14 @@ var rl;
 var timer;
 var read;
 var write;
+
+var filename;
+var renderBar = function (){
+  process.stdout.write (filename + " " + this.stats.size + " " +
+      this.stats.speed + " " + this.stats.eta + " [" +
+      this.stats.progress + "] " + this.stats.percentage);
+  process.stdout.cursorTo (0);
+};
 
 //The main parser is not cached
 argp.createParser ()
@@ -158,7 +167,7 @@ function createClient (argv){
     if (read){
       read.gs.abort ();
     }else if (write){
-      
+      write.ps.abort ();
     }else{
       again ();
     }
@@ -204,25 +213,12 @@ function get (argv){
     
     read = {};
     read.local = local;
-    
-    read.ws = fs.createWriteStream (read.local)
-        .on ("error", function (error){
-          read.error = error;
-          read.gs.abort ();
-        })
-        .on ("finish", function (){
-          read = null;
-          clearInterval (noExtensionsTimer);
-          console.log ();
-          rl.prompt ();
-        });
         
     var bar;
-    var filename = formatFilename (argv.get[0]);
+    filename = formatFilename (argv.get[0]);
     var noExtensionsTimer = null;
     
-    read.gs = client.createGetStream (argv.get[0]);
-    read.gs
+    read.gs = client.createGetStream (argv.get[0])
         .on ("error", function (error){
           if (bar) bar.clearInterval ();
           clearInterval (noExtensionsTimer);
@@ -242,7 +238,7 @@ function get (argv){
           clearInterval (noExtensionsTimer);
           
           if (read.error){
-            //Error from the ws
+            //The error comes from the ws
             if (started) console.log ();
             
             fs.unlink (read.local, function (){
@@ -266,12 +262,7 @@ function get (argv){
             bar = statusBar.create ({
               total: stats.size,
               frequency: 200,
-              write: function (){
-                process.stdout.write (filename + " " + this.stats.size + " " +
-                    this.stats.speed + " " + this.stats.eta + " [" +
-                    this.stats.progress + "] " + this.stats.percentage);
-                process.stdout.cursorTo (0);
-              }
+              write: renderBar
             });
             this.pipe (bar);
           }else{
@@ -285,8 +276,21 @@ function get (argv){
               process.stdout.write (dots.slice (0, i++));
             }, 200);
           }
+        });
+    
+    read.ws = fs.createWriteStream (read.local)
+        .on ("error", function (error){
+          read.error = error;
+          read.gs.abort ();
         })
-        .pipe (read.ws);
+        .on ("finish", function (){
+          read = null;
+          clearInterval (noExtensionsTimer);
+          console.log ();
+          rl.prompt ();
+        });
+    
+    read.gs.pipe (read.ws);
   });
 };
 
@@ -294,7 +298,70 @@ function put (argv){
   clearTimeout (timer);
   timer = null;
   
-  write = {};
+  var remote = argv.put[1] || path.basename (argv.put[0]);
   
+  try{
+    client._checkRemote (remote);
+  }catch (e){
+    return notifyError (e.message);
+  }
   
+  //Check if local is a dir or doesn't exist to prevent from starting a new
+  //request
+  fs.stat (argv.put[0], function (error, stats){
+    if (error) return notifyError (error.message);
+    if (stats.isDirectory ()){
+      return notifyError ("The local file is a directory");
+    }
+    
+    filename = formatFilename (argv.put[0]);
+    var bar = statusBar.create ({
+      total: stats.size,
+      frequency: 200,
+      write: renderBar
+    });
+    
+    write = {};
+    write.remote = remote;
+    
+    write.rs = fs.createReadStream (argv.put[0])
+        .on ("error", function (error){
+          write.error = error;
+          write.ps.abort ();
+        });
+    
+    write.ps = client.createPutStream (remote, { size: stats.size })
+        .on ("error", function (error){
+          if (bar) bar.clearInterval ();
+          
+          write.rs.on ("close", function (){
+            write = null;
+            notifyError (error.message);
+          });
+          write.rs.destroy ();
+        })
+        .on ("abort", function (){
+          if (bar) bar.clearInterval ();
+          
+          if (write.error){
+            //The error comes from the rs
+            console.log ();
+            var error = write.error;
+            write = null;
+            notifyError (error.message);
+          }else{
+            var rs = write.rs;
+            rs.on ("close", again);
+            rs.destroy ();
+          }
+        })
+        .on ("finish", function (){
+          write = null;
+          console.log ();
+          rl.prompt ();
+        });
+    
+    write.rs.pipe (write.ps);
+    write.rs.pipe (bar);
+  });
 };
