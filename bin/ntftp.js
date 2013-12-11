@@ -227,7 +227,7 @@ function get (argv){
           if (bar) bar.clearInterval ();
           clearInterval (noExtensionsTimer);
           
-          console.log ();
+          if (started) console.log ();
           
           read.ws.on ("close", function (){
             fs.unlink (read.local, function (){
@@ -241,15 +241,13 @@ function get (argv){
           if (bar) bar.clearInterval ();
           clearInterval (noExtensionsTimer);
           
-          var local = read.local;
-          var error = read.error;
-          read = null;
-          
-          if (error){
+          if (read.error){
             //Error from the ws
             if (started) console.log ();
             
-            fs.unlink (local, function (){
+            fs.unlink (read.local, function (){
+              var error = read.error;
+              read = null;
               notifyError (error.message);
             });
           }else{
