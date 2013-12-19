@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "argp": "1.0.x",
-    "status-bar": "0.0.x"
+    "status-bar": "1.0.x"
   },
   "bin": {
     "ntftp": "bin/ntftp.js"
