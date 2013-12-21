@@ -26,13 +26,13 @@ Full-featured streaming TFTP client. It supports most of the RFCs:
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `netascii` transfer mode ✗
 
-Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines support the block size extension and they agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the file transfer is pretty slow due to the lock-step mechanism, one ack for each packet.
+Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the file transfer is pretty slow due to the lock-step mechanism, one ack for each packet.
 
 However, there are two de facto extensions that can boost the TFTP transfer speed achieving good speeds with an unlimited file size: the rollover and the window size.
 
-This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the official lock-step TFTP implementation.
+This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation.
 
-#### Quick examples ####
+#### Quick example ####
 
 ```javascript
 var ntftp = require ("ntftp");
@@ -54,7 +54,7 @@ client.put ("local-file", "remote-file", function (error){
 
 #### Streams ####
 
-__GET: remote -> local__
+__GET remote -> local__
 
 ```javascript
 var get = client.createGetStream ("remote-file")
@@ -70,7 +70,7 @@ var write = fs.createWriteStream ("local-file")
 get.pipe (write);
 ```
 
-__PUT: local -> remote__
+__PUT local -> remote__
 
 ```javascript
 var read = fs.createReadStream ("local-file")
