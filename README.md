@@ -94,7 +94,7 @@ read.pipe (put);
 npm install ntftp -g
 ```
 
-Then you can access to the `ntftp` binary. Full help `ntftp -h`.
+Then you can access to the `ntftp` binary.
 
 There basically two ways to use it: with or without a shell.
 
