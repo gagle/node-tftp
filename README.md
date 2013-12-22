@@ -32,7 +32,7 @@ However, there are two de facto extensions that can boost the TFTP transfer spee
 
 This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation.
 
-It can be installed locally in order to use it programmatically, but it be also installed globally and used directly from the console.
+It can be installed locally to use it programmatically, but it can be also installed globally and used directly from the console.
 
 #### Quick example ####
 
