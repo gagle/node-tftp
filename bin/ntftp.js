@@ -46,10 +46,17 @@ function parseUri (uri){
   if (o.protocol !== "tftp:"){
     return { error: new Error ("The protocol must be 'tftp'") };
   }
+  if (!o.path){
+    return { error: new Error ("Bad uri") };
+  }
+  var arr = o.path.slice (1).split (";mode=");
+  if (arr[1] && arr[1] !== "octet"){
+    return this.fail (new Error ("The transfer mode must be 'octet'"));
+  }
   return {
     hostname: o.hostname,
     port: o.port,
-    file: o.path.slice (1).split (";mode=")
+    file: arr[0]
   };
 };
 
@@ -144,12 +151,7 @@ var command = main
         .description ("GETs a file from the server")
         .on ("end", function (argv){
           var o = parseUri (argv.get[0] + "");
-          if (o.error){
-            return this.fail (o.error);
-          }
-          if (o.mode !== "octet"){
-            return this.fail (new Error ("The transfer mode must be 'octet'"));
-          }
+          if (o.error) return this.fail (o.error);
           
           argv.server = {
             hostname: o.hostname,
@@ -159,9 +161,8 @@ var command = main
           createClient (argv);
           createPrompt (true);
           
-          get (o.file, argv.get[1], function (error, abort){
+          get (o.file, argv.get[1], function (error){
             if (error) notifyError (error);
-            if (abort) console.log ();
             process.exit ();
           });
         })
@@ -181,12 +182,7 @@ var command = main
         .description ("PUTs a file into the server")
         .on ("end", function (argv){
           var o = parseUri (argv.put[argv.put.length - 1] + "");
-          if (o.error){
-            return this.fail (o.error);
-          }
-          if (o.mode !== "octet"){
-            return this.fail (new Error ("The transfer mode must be 'octet'"));
-          }
+          if (o.error) return this.fail (o.error);
           
           argv.server = {
             hostname: o.hostname,
@@ -197,9 +193,8 @@ var command = main
           createPrompt (true);
           
           put (argv.put.length === 1 ? o.file : argv.put[0], o.file,
-              function (error, abort){
+              function (error){
             if (error) notifyError (error);
-            if (abort) console.log ();
             process.exit ();
           });
         })
@@ -405,8 +400,8 @@ function get (remote, local, cb){
     
     filename = formatFilename (remote);
     
-    var started;
-    var bar;
+    var started = false;
+    var bar = null;
     var noExtensionsTimer = null;
     
     read = {};
@@ -430,10 +425,10 @@ function get (remote, local, cb){
           if (bar) bar.cancel ();
           clearInterval (noExtensionsTimer);
           
+          if (started) console.log ();
+          
           if (read.error){
             //The error comes from the ws
-            if (started) console.log ();
-            
             fs.unlink (local, function (){
               var error = read.error;
               read = null;
@@ -443,7 +438,7 @@ function get (remote, local, cb){
             read.ws.on ("close", function (){
               read = null;
               fs.unlink (local, function (){
-                cb (null, true);
+                cb ();
               });
             });
             read.ws.destroy ();
@@ -527,6 +522,8 @@ function put (local, remote, cb){
         .on ("error", function (error){
           if (bar) bar.cancel ();
           
+          console.log ();
+          
           write.rs.on ("close", function (){
             write = null;
             cb (error);
@@ -535,18 +532,16 @@ function put (local, remote, cb){
         })
         .on ("abort", function (){
           if (bar) bar.cancel ();
+          console.log ();
           
           if (write.error){
             //The error comes from the rs
-            console.log ();
             var error = write.error;
             write = null;
             cb (error);
           }else{
             var rs = write.rs;
-            rs.on ("close", function (){
-              cb (null, true);
-            });
+            rs.on ("close", cb);
             rs.destroy ();
           }
         })
