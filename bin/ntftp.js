@@ -9,6 +9,7 @@ var url = require ("url");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
 var ntftp = require ("../lib");
+var checkRemote = require ("../lib/check-remote");
 
 var client;
 var rl;
@@ -27,7 +28,7 @@ var renderStatusBar = function (stats){
   process.stdout.cursorTo (0);
 };
 
-function formatFilename (filename){
+var formatFilename = function (filename){
   //80 - 59
   var filenameMaxLength = 21;
   if (filename.length > filenameMaxLength){
@@ -41,7 +42,7 @@ function formatFilename (filename){
   return filename;
 };
 
-function parseUri (uri){
+var parseUri = function (uri){
   var o = url.parse (uri);
   if (o.protocol !== "tftp:"){
     return { error: new Error ("The protocol must be 'tftp'") };
@@ -57,6 +58,53 @@ function parseUri (uri){
     hostname: o.hostname,
     port: o.port,
     file: arr[0]
+  };
+};
+
+var notifyError = function (error, prompt){
+  console.error ("Error: " + error.message);
+  if (prompt) rl.prompt ();
+};
+
+var again = function (){
+  timer = setTimeout (function (){
+    timer = null;
+  }, 3000);
+  
+  console.log ("\n(^C again to quit)");
+  rl.line = "";
+  rl.prompt ();
+};
+
+var normalizeGetFiles = function (remote, local){
+  remote += "";
+  local = (local || remote) + "";
+  
+  try{
+    checkRemote (remote);
+  }catch (error){
+    throw error;
+  }
+  
+  return {
+    remote: remote,
+    local: local
+  };
+};
+
+var normalizePutFiles = function (local, remote){
+  local += "";
+  remote = (remote || path.basename (local)) + "";
+  
+  try{
+    checkRemote (remote);
+  }catch (error){
+    throw error;
+  }
+  
+  return {
+    remote: remote,
+    local: local
   };
 };
 
@@ -153,6 +201,12 @@ var command = main
           var o = parseUri (argv.get[0] + "");
           if (o.error) return this.fail (o.error);
           
+          try{
+            var files = normalizeGetFiles (o.file, argv.get[1]);
+          }catch (error){
+            return this.fail (error);
+          }
+          
           argv.server = {
             hostname: o.hostname,
             port: o.port
@@ -161,7 +215,7 @@ var command = main
           createClient (argv);
           createPrompt (true);
           
-          get (o.file, argv.get[1], function (error){
+          get (files.remote, files.local, function (error){
             if (error) notifyError (error);
             process.exit ();
           });
@@ -184,6 +238,13 @@ var command = main
           var o = parseUri (argv.put[argv.put.length - 1] + "");
           if (o.error) return this.fail (o.error);
           
+          try{
+            var files = normalizePutFiles (
+                argv.put.length === 1 ? o.file : argv.put[0], o.file);
+          }catch (error){
+            return this.fail (error);
+          }
+          
           argv.server = {
             hostname: o.hostname,
             port: o.port
@@ -192,8 +253,7 @@ var command = main
           createClient (argv);
           createPrompt (true);
           
-          put (argv.put.length === 1 ? o.file : argv.put[0], o.file,
-              function (error){
+          put (files.local, files.remote, function (error){
             if (error) notifyError (error);
             process.exit ();
           });
@@ -212,21 +272,6 @@ main.argv ();
 
 //Free the parsers
 main = command = null;
-
-function notifyError (error, prompt){
-  console.error ("Error: " + error.message);
-  if (prompt) rl.prompt ();
-};
-
-var again = function (){
-  timer = setTimeout (function (){
-    timer = null;
-  }, 3000);
-  
-  console.log ("\n(^C again to quit)");
-  rl.line = "";
-  rl.prompt ();
-};
 
 function createCommandParser (){
   return argp.createParser ()
@@ -258,7 +303,13 @@ function createCommandParser (){
             }
           })
           .on ("end", function (argv){
-            get (argv.get[0], argv.get[1], function (error, abort){
+            try{
+              var files = normalizeGetFiles (argv.get[0], argv.get[1]);
+            }catch (error){
+              return notifyError (error, true);
+            }
+          
+            get (files.remote, files.local, function (error, abort){
               if (error) return notifyError (error, true);
               if (abort){
                 again ();
@@ -289,7 +340,13 @@ function createCommandParser (){
             }
           })
           .on ("end", function (argv){
-            put (argv.put[0], argv.put[1], function (error, abort){
+            try{
+              var files = normalizePutFiles (argv.put[0], argv.put[1]);
+            }catch (error){
+              return notifyError (error, true);
+            }
+          
+            put (files.local, files.remote, function (error, abort){
               if (error) return notifyError (error, true);
               if (abort){
                 again ();
@@ -379,16 +436,6 @@ function createPrompt (onlySigint){
 function get (remote, local, cb){
   clearTimeout (timer);
   timer = null;
-  
-  remote += "";
-
-  try{
-    client._checkRemote (remote);
-  }catch (e){
-    return cb (e);
-  }
-  
-  local = (local || remote) + "";
   
   //Check if local is a dir and prevent from starting a request
   fs.stat (local, function (error, stats){
@@ -485,15 +532,6 @@ function get (remote, local, cb){
 function put (local, remote, cb){
   clearTimeout (timer);
   timer = null;
-  
-  local += "";
-  remote = (remote || path.basename (local)) + "";
-  
-  try{
-    client._checkRemote (remote);
-  }catch (e){
-    return cb (e);
-  }
   
   //Check if local is a dir or doesn't exist to prevent from starting a new
   //request
