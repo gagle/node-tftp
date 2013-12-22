@@ -32,13 +32,15 @@ However, there are two de facto extensions that can boost the TFTP transfer spee
 
 This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation.
 
+It can be installed locally in order to use it programmatically, but it be also installed globally and used directly from the console.
+
 #### Quick example ####
 
 ```javascript
 var ntftp = require ("ntftp");
 
 var client = ntftp.createClient ({
-  hostname: "hostname"
+  hostname: "localhost"
 });
 
 client.get ("remote-file", "local-file", function (error){
@@ -78,10 +80,63 @@ var read = fs.createReadStream ("local-file")
       put.abort ();
     });
 		
-var put = client.createPutStream ("remote-file")
+var put = client.createPutStream ("remote-file", { size: ... })
     .on ("error", function (error){
       read.destroy ();
     });
 
 read.pipe (put);
 ```
+
+#### Global installation ####
+
+```
+npm install ntftp -g
+```
+
+Then you can access to the `ntftp` binary. Full help `ntftp -h`.
+
+There basically two ways to use it: with or without a shell.
+
+__Without a shell__
+
+Best for individual transfers.
+
+```
+$ ntftp get [options] <rfc3617_uri> [<local>]
+$ ntftp put [options] [<local>] <rfc3617_uri>
+```
+
+For example:
+
+```
+$ ntftp get tftp://localhost/remote-file
+remote-file             42.2 MiB   32.6M/s 00:12 [###·····················]  13%
+```
+
+```
+$ ntftp put my/local-file tftp://localhost/remote-file
+my/local-file          148.8 MiB   30.9M/s 00:07 [###########·············]  45%
+```
+
+For more information type `ntftp get|put -h`.
+
+__With a shell__
+
+Best for multiple transfers, basically because the same server address is reused.
+
+```
+$ ntftp [options] <host>[:<port>]
+```
+
+For example:
+
+```
+$ ntftp localhost
+> get remote-file
+remote-file             42.2 MiB   32.6M/s 00:12 [###·····················]  13%
+> put my/local-file remote-file
+my/local-file          148.8 MiB   30.9M/s 00:07 [###########·············]  45%
+```
+
+For more information type `ntftp -h` and `get|put -h`.

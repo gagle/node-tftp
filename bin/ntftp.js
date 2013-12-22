@@ -112,19 +112,19 @@ var setMainParserOptions = function (body){
   //The default values are set inside the lib
   body
       .option ({ short: "b", long: "blksize", metavar: "SIZE",
-          type: Number, description: "Sets the blksize option extension. " +
-          "Valid range: [8, 65464]. Default is 1468, the size before IP " +
-          "fragmentation in Ethernet environments" })
+          type: Number, description: "Sets the blksize option. Valid range: " +
+          "[8, 65464]. Default is 1468, the size before IP fragmentation in " +
+          "Ethernet environments" })
       .option ({ short: "r", long: "retries", metavar: "NUM",
-          type: Number, description: "Number of retries before finishing the " +
-          "transfer of the file due to an unresponsive server or a massive " +
-          "packet loss" })
+          type: Number, description: "Number of retries before aborting the " +
+          "file transfer due to an unresponsive server or a massive packet " +
+          "loss" })
       .option ({ short: "t", long: "timeout", metavar: "MILLISECONDS",
-          type: Number, description: "Sets the timeout option extension. " +
-          "Default is 3000ms" })
+          type: Number, description: "Sets the timeout option. Default is " +
+          "3000ms" })
       .option ({ short: "w", long: "windowsize", metavar: "SIZE",
-          type: Number, description: "Sets the windowsize option extension. " +
-          "Valid range: [1, 65535]. Default is 4" })
+          type: Number, description: "Sets the windowsize option. Valid " +
+          "range: [1, 65535]. Default is 4" })
       .help ();
 };
 
@@ -147,8 +147,8 @@ var main = argp.createParser ()
         .readPackage (__dirname + "/../package.json")
         .usages ([
           "ntftp [options] <host>[:<port>]",
-          "ntftp [options] get <rfc3617_uri> [<local>]",
-          "ntftp [options] put [<local>] <rfc3617_uri>",
+          "ntftp get [options] <rfc3617_uri> [<local>]",
+          "ntftp put [options] [<local>] <rfc3617_uri>",
         ])
         .allowUndefinedArguments ()
         .on ("argument", function (argv, argument, ignore){
@@ -180,7 +180,7 @@ var main = argp.createParser ()
             .text ("\nOnce the shell is running, it shows a prompt and " +
                 "recognizes the following commands:", "  ")
             .text ("get, put.", "    ")
-            .text ("\n<command> -h for more information.", "  ")
+            .text ("\n'<command> -h' for more information.", "  ")
             .text ("\nTo quit the program press ctrl-c two times.", "  ")
             .text ("\nExample:", "  ")
             .text ("$ ntftp localhost -w 2 --blksize 256", "    ")
@@ -189,13 +189,13 @@ var main = argp.createParser ()
             .text ("> put path/to/local_file remote_file", "    ")
             .text ("\nCommands:")
             .text ("get, put.", "  ")
-            .text ("\n<command> -h for more information.", "  ")
+            .text ("\n'ntftp <command> -h' for more information.", "  ")
             .text ("\nOptions:");
 setMainParserOptions (main);
 
 var command = main
     .command ("get", { trailing: { min: 1, max: 2 } })
-        .usages (["ntftp [options] get <rfc3617_uri> [<local>]"])
+        .usages (["ntftp get [options] <rfc3617_uri> [<local>]"])
         .description ("GETs a file from the server")
         .on ("end", function (argv){
           var o = parseUri (argv.get[0] + "");
@@ -232,7 +232,7 @@ setMainParserOptions (command);
 
 var command = main
     .command ("put", { trailing: { min: 1, max: 2 } })
-        .usages (["ntftp [options] put [<local>] <rfc3617_uri>"])
+        .usages (["ntftp put [options] [<local>] <rfc3617_uri>"])
         .description ("PUTs a file into the server")
         .on ("end", function (argv){
           var o = parseUri (argv.put[argv.put.length - 1] + "");
