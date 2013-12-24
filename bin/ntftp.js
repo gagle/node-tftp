@@ -20,11 +20,11 @@ var filename;
 
 var renderStatusBar = function (stats){
   process.stdout.write (filename + " " + 
-      statusBar.format.storage (stats.currentSize) + " " +
-      statusBar.format.speed (stats.speed) + " " +
-      statusBar.format.time (stats.remainingTime) + " [" +
-      stats.progressBar + "] " +
-      statusBar.format.percentage (stats.percentage));
+      this.format.storage (stats.currentSize) + " " +
+      this.format.speed (stats.speed) + " " +
+      this.format.time (stats.remainingTime) + " [" +
+      this.format.progressBar (stats.percentage) + "] " +
+      this.format.percentage (stats.percentage));
   process.stdout.cursorTo (0);
 };
 
@@ -389,6 +389,8 @@ function createPrompt (onlySigint){
         read.gs.abort ();
       }else if (write){
         write.ps.abort ();
+      }else{
+        process.exit ();
       }
     });
     return;
