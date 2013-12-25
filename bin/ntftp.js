@@ -372,8 +372,7 @@ function createClient (argv){
     blockSize: argv.blksize,
     retries: argv.retries,
     timeout: argv.timeout,
-    windowSize: argv.windowsize,
-    mode: argv.mode
+    windowSize: argv.windowsize
   });
 };
 
@@ -496,14 +495,14 @@ function get (remote, local, cb){
         .on ("stats", function (stats){
           started = true;
           
-          if (stats){
+          if (stats.size !== null){
             bar = statusBar.create ({
               total: stats.size,
               render: renderStatusBar
             });
             this.pipe (bar);
           }else{
-            //No extensions
+            //The server doesn't support extensions
             var dots = "...";
             var i = 1;
             noExtensionsTimer = setInterval (function (){
