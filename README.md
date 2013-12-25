@@ -123,7 +123,7 @@ For more information type `ntftp get|put -h`.
 
 __With a shell__
 
-Best for multiple transfers, basically because the same server address is reused.
+Best for multiple transfers, basically because the same server address and options are reused.
 
 ```
 $ ntftp [options] <host>[:<port>]
