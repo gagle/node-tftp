@@ -9,7 +9,7 @@ var url = require ("url");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
 var ntftp = require ("../lib");
-var checkRemote = require ("../lib/check-remote");
+var normalizeRemote = require ("../lib/normalize-remote");
 
 var client;
 var rl;
@@ -81,7 +81,7 @@ var normalizeGetFiles = function (remote, local){
   local = (local || remote) + "";
   
   try{
-    checkRemote (remote);
+    remote = normalizeRemote (remote);
   }catch (error){
     throw error;
   }
@@ -97,7 +97,7 @@ var normalizePutFiles = function (local, remote){
   remote = (remote || path.basename (local)) + "";
   
   try{
-    checkRemote (remote);
+    remote = normalizeRemote (remote);
   }catch (error){
     throw error;
   }
