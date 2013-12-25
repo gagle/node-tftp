@@ -56,6 +56,8 @@ client.put ("local-file", "remote-file", function (error){
 
 #### Streams ####
 
+For the sake of simplicity the following examples handle the errors partially. See [streams.js](https://github.com/gagle/node-ntftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-ntftp/blob/master/lib/client.js) of the [get()](#client-put) and [get()](#client-put) for more information.
+
 __GET remote -> local__
 
 ```javascript
