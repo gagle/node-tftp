@@ -98,7 +98,7 @@ npm install ntftp -g
 
 Then you can access to the `ntftp` binary.
 
-There basically two ways to use it: with or without a shell.
+There are basically two ways to use it: with or without a shell.
 
 __Without a shell__
 
