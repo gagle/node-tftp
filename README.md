@@ -142,3 +142,7 @@ my/local-file          148.8 MiB   30.9M/s 00:07 [###########·········�
 ```
 
 For more information type `ntftp -h` and `get|put -h`.
+
+#### Special thanks ####
+
+Patrick Masotta (author of the Serva application and the internet draft about the `windowsize` option).
