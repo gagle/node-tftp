@@ -145,4 +145,4 @@ For more information type `ntftp -h` and `get|put -h`.
 
 #### Special thanks ####
 
-Patrick Masotta (author of the Serva application and the internet draft about the `windowsize` option).
+Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) application and the internet draft about the `windowsize` option).
