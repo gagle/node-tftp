@@ -10,7 +10,7 @@ ntftp
 
 ### WARNING ###
 
-The implementation it's already done, you can GET and PUT files correctly. However, for your safety don't use it in production or development, just for testing purposes. It will be ready when it reaches the version 0.1.0.
+The implementation it's already done, you can GET and PUT files correctly. However, some optimizations must still be done, so for your safety don't use it in production or development, just for testing purposes. It will be ready when it reaches the version 0.1.0.
 
 ---
 
