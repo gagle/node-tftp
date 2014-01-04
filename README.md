@@ -1,7 +1,7 @@
 ntftp
 =====
 
-#### Streaming TFTP client ####
+#### Streaming TFTP client #### [![Gittip](http://img.shields.io/gittip/gagle.png)](https://www.gittip.com/gagle "Gittip Badge")
 
 [![NPM version](https://badge.fury.io/js/ntftp.png)](http://badge.fury.io/js/ntftp "Fury Version Badge")
 [![Dependency Status](https://david-dm.org/gagle/node-ntftp.png)](https://david-dm.org/gagle/node-ntftp "David Dependency Manager Badge")
@@ -10,7 +10,7 @@ ntftp
 
 ### WARNING ###
 
-The implementation is practically done, you can GET and PUT files correctly. However, the timeout retransmissions and some minor fixes need to be done, so don't use it in production or development, just for testing purposes. It will be usable when it reaches the version 0.1.0.
+The implementation is practically done, you can GET and PUT files correctly. However some minor fixes need to be done, so don't use it in production or development, just for testing purposes. It will be usable when it reaches the version 0.1.0.
 
 ---
 
