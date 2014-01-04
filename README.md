@@ -1,4 +1,4 @@
-ntftp [![Gittip](http://img.shields.io/gittip/gagle.png)](https://www.gittip.com/gagle "Gittip Badge")
+ntftp
 =====
 
 #### Streaming TFTP client ####
