@@ -10,7 +10,7 @@ ntftp
 
 ### WARNING ###
 
-The implementation is practically done, you can GET and PUT files correctly. However some minor fixes need to be done, so don't use it in production or development, just for testing purposes. It will be usable when it reaches the version 0.1.0.
+The implementation it's already done, you can GET and PUT files correctly. However, for your safety don't use it in production or development, just for testing purposes. It will be ready when it reaches the version 0.1.0.
 
 ---
 
@@ -28,11 +28,11 @@ Full-featured streaming TFTP client. It supports most of the RFCs:
 
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one ack for each packet.
 
-However, there are two de facto extensions that can boost the TFTP transfer speed achieving good speeds with an unlimited file size: the rollover and the window size.
+However, there are two de facto extensions that can boost the TFTP transfer speed and remove the size limit: the rollover and the window.
 
 This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation.
 
-It can be installed locally to use it programmatically, but it can be also installed globally and used directly from the console.
+It can be installed locally and use it programmatically, but it can be also installed globally and used directly from the console as a CLI utility.
 
 #### Quick example ####
 
@@ -54,22 +54,35 @@ client.put ("local-file", "remote-file", function (error){
 });
 ```
 
-#### Streams ####
+#### Special thanks ####
 
-For the sake of simplicity the following examples handle the errors partially. See [streams.js](https://github.com/gagle/node-ntftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-ntftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
+Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) application and the internet draft about the `windowsize` option).
+
+#### Documentation ####
+
+- [Streams](#streams)
+- [Warning! UDP packet loss in Windows](#udploss)
+
+#### Functions ####
+
+- [_module_.createClient(options) : Client](#createclient)
+
+#### Objects ####
+
+- [Client](#client)
+
+---
+
+<a name="streams"></a>
+__Streams__
+
+For the sake of simplicity the following examples omit the error handlind. See [streams.js](https://github.com/gagle/node-ntftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-ntftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
 
 __GET remote → local__
 
 ```javascript
-var get = client.createGetStream ("remote-file")
-    .on ("error", function (error){
-      write.destroy ();
-    });
-
-var write = fs.createWriteStream ("local-file")
-    .on ("error", function (error){
-      get.abort ();
-    });
+var get = client.createGetStream ("remote-file");
+var write = fs.createWriteStream ("local-file");
 
 get.pipe (write);
 ```
@@ -77,15 +90,8 @@ get.pipe (write);
 __PUT local → remote__
 
 ```javascript
-var read = fs.createReadStream ("local-file")
-    .on ("error", function (error){
-      put.abort ();
-    });
-		
-var put = client.createPutStream ("remote-file", { size: ... })
-    .on ("error", function (error){
-      read.destroy ();
-    });
+var localFile = fs.createReadStream ("local-file");
+var read = client.createPutStream ("remote-file", { size: totalSize });
 
 read.pipe (put);
 ```
@@ -143,6 +149,41 @@ my/local-file          148.8 MiB   30.9M/s 00:07 [###########·········�
 
 For more information type `ntftp -h` and `get|put -h`.
 
-#### Special thanks ####
+<a name="udploss"></a>
+__Warning! UDP packet loss in Windows__
 
-Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) application and the internet draft about the `windowsize` option).
+Currently, in Windows there is a problem concerning the buffering of the received network packets ([#6696](https://github.com/joyent/node/issues/6696)). Basically, when the buffer is full, all the subsequent incoming packets are dropped, so they are never consumed by Node.js. This scenario can be reproduced by configuring a window bigger than 6 blocks with the default block size. So the advice is: do NOT increment the default window size (4) in the Windows platform until this bug is solved.
+
+<a name="createclient"></a>
+___module_.createClient(options) : Client__
+
+---
+
+<a name="client"></a>
+__Client__
+
+__Methods__
+
+- [Client#createGetStream(remoteFile[, options]) : ReadStream](#client_creategetstream)
+- [Client#createPutStream(remoteFile, options) : WriteStream](#client_createputstream)
+- [Client#get(remoteFile[, localFile][, options], callback) : undefined](#client_get)
+- [Client#put(localFile[, remoteFile], callback) : undefined](#client_put)
+
+<a name="client_creategetstream"></a>
+__Client#createGetStream(remoteFile[, options]) : ReadStream__
+
+
+
+<a name="client_createputstream"></a>
+__Client#createPutStream(remoteFile, options) : WriteStream__
+
+
+
+<a name="client_get"></a>
+__Client#get(remoteFile[, localFile][, options], callback) : undefined__
+
+
+
+<a name="client_put"></a>
+__Client#put(localFile[, remoteFile], callback) : undefined__
+
