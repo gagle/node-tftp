@@ -60,8 +60,9 @@ Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) applicatio
 
 #### Documentation ####
 
-- [Streams](#streams)
 - [Warning! UDP packet loss in Windows](#udploss)
+- [Streams](#streams)
+- [Global installation](#global)
 
 #### Functions ####
 
@@ -70,6 +71,13 @@ Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) applicatio
 #### Objects ####
 
 - [Client](#client)
+
+---
+
+<a name="udploss"></a>
+__Warning! UDP packet loss in Windows__
+
+Currently, in Windows there is a problem concerning the buffering of the received network packets ([#6696](https://github.com/joyent/node/issues/6696)). Basically, when the buffer is full, all the subsequent incoming packets are dropped, so they are never consumed by Node.js. This scenario can be reproduced by configuring a window bigger than 6 blocks with the default block size. So the advice is: do NOT increment the default window size (4) in the Windows platform until this bug is solved.
 
 ---
 
@@ -96,7 +104,10 @@ var read = client.createPutStream ("remote-file", { size: totalSize });
 read.pipe (put);
 ```
 
-#### Global installation ####
+---
+
+<a name="global"></a>
+__Global installation__
 
 ```
 npm install ntftp -g
@@ -149,10 +160,7 @@ my/local-file          148.8 MiB   30.9M/s 00:07 [###########·········�
 
 For more information type `ntftp -h` and `get|put -h`.
 
-<a name="udploss"></a>
-__Warning! UDP packet loss in Windows__
-
-Currently, in Windows there is a problem concerning the buffering of the received network packets ([#6696](https://github.com/joyent/node/issues/6696)). Basically, when the buffer is full, all the subsequent incoming packets are dropped, so they are never consumed by Node.js. This scenario can be reproduced by configuring a window bigger than 6 blocks with the default block size. So the advice is: do NOT increment the default window size (4) in the Windows platform until this bug is solved.
+---
 
 <a name="createclient"></a>
 ___module_.createClient(options) : Client__
