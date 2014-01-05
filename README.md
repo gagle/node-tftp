@@ -26,7 +26,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [3617 - Uniform Resource Identifier (URI)](http://www.ietf.org/rfc/rfc3617.txt) ✓
 - [De facto (draft) - Windowsize option](http://www.ietf.org/id/draft-masotta-tftpexts-windowsize-opt-08.txt) ✓
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
-- `netascii` transfer mode ✗
+- `mail` and `netascii` transfer modes ✗
 
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one ack for each packet.
 
