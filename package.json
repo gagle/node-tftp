@@ -1,6 +1,6 @@
 {
   "name": "tftp",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Streaming TFTP client and server",
   "keywords": ["tftp", "client", "stream"],
   "author": "Gabriel Llamas <gagle@outlook.com>",
