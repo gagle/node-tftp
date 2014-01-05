@@ -1,20 +1,22 @@
-ntftp
-=====
+tftp
+====
 
-#### Streaming TFTP client ####
+#### Streaming TFTP client and Server ####
 
-[![NPM version](https://badge.fury.io/js/ntftp.png)](http://badge.fury.io/js/ntftp "Fury Version Badge")
-[![Dependency Status](https://david-dm.org/gagle/node-ntftp.png)](https://david-dm.org/gagle/node-ntftp "David Dependency Manager Badge")
+[![NPM version](https://badge.fury.io/js/tftp.png)](http://badge.fury.io/js/tftp "Fury Version Badge")
+[![Dependency Status](https://david-dm.org/gagle/node-tftp.png)](https://david-dm.org/gagle/node-tftp "David Dependency Manager Badge")
 
-[![NPM installation](https://nodei.co/npm/ntftp.png?mini=true)](https://nodei.co/npm/ntftp "NodeICO Badge")
+[![NPM installation](https://nodei.co/npm/tftp.png?mini=true)](https://nodei.co/npm/tftp "NodeICO Badge")
 
 ### WARNING ###
 
 The implementation it's already done, you can GET and PUT files correctly. However, some optimizations must still be done, so for your safety don't use it in production or development, just for testing purposes. It will be ready when it reaches the version 0.1.0.
 
+The server is currently not implemented.
+
 ---
 
-Full-featured streaming TFTP client. It supports most of the RFCs:
+Full-featured streaming TFTP client and server. It supports most of the RFCs:
 
 - [1350 - The TFTP protocol](http://www.ietf.org/rfc/rfc1350.txt) ✓
 - [2347 - Option extension](http://www.ietf.org/rfc/rfc2347.txt) ✓

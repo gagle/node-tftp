@@ -1,7 +1,7 @@
 {
-  "name": "ntftp",
+  "name": "tftp",
   "version": "0.0.0",
-  "description": "Streaming TFTP client",
+  "description": "Streaming TFTP client and server",
   "keywords": ["tftp", "client", "stream"],
   "author": "Gabriel Llamas <gagle@outlook.com>",
   "repository": "git://github.com/gagle/node-tftp-client.git",
