@@ -41,9 +41,7 @@ It can be installed locally and use it programmatically, but it can be also inst
 ```javascript
 var tftp = require ("tftp");
 
-var client = tftp.createClient ({
-  hostname: "localhost"
-});
+var client = tftp.createClient ();
 
 client.get ("remote-file", "local-file", function (error){
   if (error) return console.error (error);
