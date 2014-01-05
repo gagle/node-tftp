@@ -73,6 +73,8 @@ Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) applicatio
 #### Objects ####
 
 - [Client](#client)
+- [GetStream](#getstream)
+- [PutStream](#putstream)
 
 ---
 
@@ -86,7 +88,7 @@ Currently, in Windows there is a problem concerning the buffering of the receive
 <a name="streams"></a>
 __Streams__
 
-For the sake of simplicity the following examples omit the error handlind. See [streams.js](https://github.com/gagle/node-tftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-tftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
+For the sake of simplicity the following examples omit the error handling. See [streams.js](https://github.com/gagle/node-tftp/blob/master/examples/streams.js) example or the [source code](https://github.com/gagle/node-tftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
 
 __GET remote → local__
 
@@ -174,18 +176,18 @@ __Client__
 
 __Methods__
 
-- [Client#createGetStream(remoteFile[, options]) : ReadStream](#client_creategetstream)
-- [Client#createPutStream(remoteFile, options) : WriteStream](#client_createputstream)
+- [Client#createGetStream(remoteFile[, options]) : GetStream](#client_creategetstream)
+- [Client#createPutStream(remoteFile, options) : PutStream](#client_createputstream)
 - [Client#get(remoteFile[, localFile][, options], callback) : undefined](#client_get)
 - [Client#put(localFile[, remoteFile], callback) : undefined](#client_put)
 
 <a name="client_creategetstream"></a>
-__Client#createGetStream(remoteFile[, options]) : ReadStream__
+__Client#createGetStream(remoteFile[, options]) : GetStream__
 
 
 
 <a name="client_createputstream"></a>
-__Client#createPutStream(remoteFile, options) : WriteStream__
+__Client#createPutStream(remoteFile, options) : PutStream__
 
 
 
@@ -196,4 +198,18 @@ __Client#get(remoteFile[, localFile][, options], callback) : undefined__
 
 <a name="client_put"></a>
 __Client#put(localFile[, remoteFile], callback) : undefined__
+
+
+
+---
+
+<a name="getstream"></a>
+__GetStream__
+
+
+
+---
+
+<a name="putstream"></a>
+__PutStream__
 
