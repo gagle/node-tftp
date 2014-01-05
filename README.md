@@ -66,7 +66,7 @@ Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) applicatio
 
 #### Functions ####
 
-- [_module_.createClient(options) : Client](#createclient)
+- [_module_.createClient([options]) : Client](#createclient)
 
 #### Objects ####
 
@@ -170,7 +170,10 @@ ___module_.createClient([options]) : Client__
 Returns a new [Client](#client) instance.
 
 ```javascript
-var client = tftp.createClient ();
+var client = tftp.createClient ({
+  hostname: "10.10.10.10",
+  port: 1234
+});
 ```
 
 Options:
