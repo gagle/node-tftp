@@ -11,9 +11,7 @@ and how to abort a transfer when you need to use the streams with other sources
 or destinations.
 */
 
-var client = ntftp.createClient ({
-  hostname: "localhost"
-});
+var client = ntftp.createClient ();
 
 var get = function (remote, local, cb){
   var wsError;

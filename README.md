@@ -167,20 +167,18 @@ For more information type `ntftp -h` and `get|put -h`.
 ---
 
 <a name="createclient"></a>
-___module_.createClient(options) : Client__
+___module_.createClient([options]) : Client__
 
 Returns a new [Client](#client) instance.
 
 ```javascript
-var client = tftp.createClient ({
-  hostname: "localhost"
-});
+var client = tftp.createClient ();
 ```
 
 Options:
 
 - __hostname__ - _String_  
-  The hostname. This option is required.
+  The hostname. Default is `localhost`.
 - __port__ - _Number_  
   The port number. Default is 69.
 - __blockSize__ - _Number_  

@@ -4,9 +4,7 @@ var ntftp = require ("../lib");
 
 //Downloads a file and at the same time uploads it again
 
-var client = ntftp.createClient ({
-  hostname: "localhost"
-});
+var client = ntftp.createClient ();
 
 var ps;
 var gs = client.createGetStream ("remote-file")
