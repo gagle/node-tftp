@@ -39,9 +39,9 @@ It can be installed locally and use it programmatically, but it can be also inst
 #### Quick example ####
 
 ```javascript
-var ntftp = require ("ntftp");
+var tftp = require ("tftp");
 
-var client = ntftp.createClient ({
+var client = tftp.createClient ({
   hostname: "localhost"
 });
 
@@ -86,7 +86,7 @@ Currently, in Windows there is a problem concerning the buffering of the receive
 <a name="streams"></a>
 __Streams__
 
-For the sake of simplicity the following examples omit the error handlind. See [streams.js](https://github.com/gagle/node-ntftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-ntftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
+For the sake of simplicity the following examples omit the error handlind. See [streams.js](https://github.com/gagle/node-tftp/blob/master/examples/streams.js) or the [source code](https://github.com/gagle/node-tftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
 
 __GET remote → local__
 
