@@ -169,6 +169,42 @@ For more information type `ntftp -h` and `get|put -h`.
 <a name="createclient"></a>
 ___module_.createClient(options) : Client__
 
+Returns a new [Client](#client) instance.
+
+```javascript
+var client = tftp.createClient ({
+  hostname: "localhost"
+});
+```
+
+Options:
+
+- __hostname__ - _String_  
+  The hostname. This option is required.
+- __port__ - _Number_  
+  The port number. Default is 69.
+- __blockSize__ - _Number_  
+  The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468.
+- __windowSize__ - _Number_  
+  The size of each window. The window size means the number of blocks that can be sent/received without an acknowledge. Valid range: [1, 65535]. Default is 4.
+- __retries__ - _Number_  
+  How many retries must be done before emitting an error. Default is 3.
+- __timeout__ - _Number_  
+  Milliseconds to wait before a retry. Default is 3000.
+- __userExtensions__ - _Object_  
+  Custom extensions to send along with a GET or PUT operation. For example:
+
+  ```
+  {
+    foo: "bar",
+    num: 2
+  }
+  ```
+  
+  The server may ignore or not these extensions, they are server-dependent. Please note that the tftp algorithm cannot be modified, these extensions must be related with something else. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
+  
+  The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
+  
 ---
 
 <a name="client"></a>
@@ -184,32 +220,115 @@ __Methods__
 <a name="client_creategetstream"></a>
 __Client#createGetStream(remoteFile[, options]) : GetStream__
 
+Returns a new [GetStream](#getstream_putstream) instance.
 
+Options:
+
+- __md5sum__ - _String_  
+  MD5 sum for validating the integrity of the file.
+- __sha1sum__ - _String_  
+  SHA1 sum for validating the integrity of the file.
+
+```javascript
+var get = client.createGetStream ("file");
+```
 
 <a name="client_createputstream"></a>
 __Client#createPutStream(remoteFile, options) : PutStream__
 
+Returns a new [PutStream](#getstream_putstream) instance.
 
+Options:
+
+- __size__ - _String_  
+  Total size of the file to upload. This option is required.
+
+```javascript
+var put = client.createPutStream ("file", { size: 1234 });
+```
 
 <a name="client_get"></a>
 __Client#get(remoteFile[, localFile][, options], callback) : undefined__
 
+Downloads a file from the server. If the local filename is missing the filename of the remote file is used.
 
+Options:
+
+- __md5sum__ - _String_  
+  MD5 sum for validating the integrity of the file.
+- __sha1sum__ - _String_  
+  SHA1 sum for validating the integrity of the file.
+
+```javascript
+//tftp://<hostname>/file -> file
+client.get ("file", function (error){
+  if (error) return console.error (error);
+  ...
+});
+```
 
 <a name="client_put"></a>
 __Client#put(localFile[, remoteFile], callback) : undefined__
 
+Uploads a file to the server. If the remote filename is missing the filename of the local file is used.
 
+```javascript
+//file -> tftp://<hostname>/file
+client.put ("file", function (error){
+  if (error) return console.error (error);
+  ...
+});
+```
 
 ---
 
-<a name="getstream"></a>
-__GetStream__
+<a name="getstream_putstream"></a>
+__GetStream and PutStream__
 
+The GetStream inherites from a Readable stream and the PutStream from a Writable stream. They have all the events and methods that can be found in the Readable and Writable streams, but they also define two more events and one more method.
 
+__Events__
+
+- [abort](#event_abort)
+- [stats](#event_stats)
+
+__Methods__
+
+- [abort() : undefined](#getstream_putstream_abort)
 
 ---
 
-<a name="putstream"></a>
-__PutStream__
+<a name="event_abort"></a>
+__abort__
 
+Emitted when [abort()](getstream_putstream_abort) is called and the transfer has been aborted.
+
+<a name="event_stats"></a>
+__stats__
+
+Emitted after the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun. It returns as an argument an object similar to this:
+
+```
+{
+  blockSize: 1468,
+  size: 105757295,
+  windowSize: 4,
+  userExtensions: null,
+  timeout: 3000,
+  localSocket: { address: "0.0.0.0", port: 58406 },
+  remoteSocket: { address: "127.0.0.1", port: 58407 },
+  file: "file",
+  retries: 3
+}
+```
+
+When the GetStream emits a `stats` event, the `size` property is not guaranteed because the server may not implement all the RFCs. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
+
+The `userExtensions` property holds an object with the custom extensions sent by the server. Most of the TFTP servers with a GUI don't let you send custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to send custom extensions, this property will be always null.
+
+---
+
+<a name="getstream_putstream_abort"></a>
+__abort() : undefined__
+
+Aborts the current transfer and emits an `abort` event.
