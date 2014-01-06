@@ -1,6 +1,8 @@
 v0.0.2 (xx Jan 2014)
   Fixed error with the sums.
-  Speed improvements (~20% faster).
+  Don't wait to the callback after sending a packet.
+  The reader and the writer inherites from the request instead of using events.
+  Speed improvement (~25% faster).
 
 v0.0.1 (05 Jan 2014)
   First release.
