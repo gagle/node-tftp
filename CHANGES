@@ -1,5 +1,6 @@
 v0.0.2 (xx Jan 2014)
   Fixed error with the sums.
+  Speed improvements (~20% faster).
 
 v0.0.1 (05 Jan 2014)
   First release.
