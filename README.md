@@ -185,7 +185,7 @@ Options:
 - __blockSize__ - _Number_  
   The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468.
 - __windowSize__ - _Number_  
-  The size of each window. The window size means the number of blocks that can be sent/received without an acknowledge. Valid range: [1, 65535]. Default is 4.
+  The size of each window. The window size means the number of blocks that can be sent/received without waiting an acknowledgement. Valid range: [1, 65535]. Default is 4.
 
   Comparison of transfer times:
   
