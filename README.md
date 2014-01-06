@@ -28,7 +28,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `mail` and `netascii` transfer modes ✗
 
-Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one ack for each packet.
+Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
 However, there are two de facto extensions that can boost the TFTP transfer speed and remove the size limit: the rollover and the window.
 
