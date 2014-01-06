@@ -30,7 +30,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the  extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
-However, there are two de facto extensions that can boost the TFTP transfer speed and remove the size limit: the rollover and the window.
+However, there are two de facto extensions that can boost the transfer speed and remove the size limit: the rollover and the window.
 
 This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation.
 
@@ -112,7 +112,7 @@ read.pipe (put);
 __Global installation__
 
 ```
-npm install ntftp -g
+npm install tftp -g
 ```
 
 Then you can access to the `ntftp` binary.
@@ -183,7 +183,7 @@ Options:
 - __port__ - _Number_  
   The port number. Default is 69.
 - __blockSize__ - _Number_  
-  The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468.
+  The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468, the MTU size before IP fragmentation in Ethernet networks.
 - __windowSize__ - _Number_  
   The size of each window. The window size means the number of blocks that can be sent/received without waiting an acknowledgement. Valid range: [1, 65535]. Default is 4.
 
@@ -216,7 +216,7 @@ Options:
   }
   ```
   
-  The server may ignore or not these extensions, they are server-dependent. Please note that the tftp algorithm cannot be modified, these extensions must be related with something else. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
+  The server may ignore or not these extensions, they are server-dependent. Please note that the TFTP algorithm cannot be modified, these extensions must be related with something else. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
   
   The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
   
@@ -321,7 +321,7 @@ Emitted when [abort()](getstream_putstream_abort) is called and the transfer has
 <a name="event_stats"></a>
 __stats__
 
-Emitted after the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun. It returns as an argument an object similar to this:
+Emitted after the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun. It returns an object similar to this:
 
 ```
 {
