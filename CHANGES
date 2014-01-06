@@ -1,4 +1,4 @@
-v0.0.2 (xx Jan 2014)
+v0.0.2 (06 Jan 2014)
   Fixed error with the sums.
   Don't wait to the callback after sending a packet.
   The reader and the writer inherites from the request instead of using events.

@@ -186,6 +186,22 @@ Options:
   The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468.
 - __windowSize__ - _Number_  
   The size of each window. The window size means the number of blocks that can be sent/received without an acknowledge. Valid range: [1, 65535]. Default is 4.
+
+  Comparison of transfer times:
+  
+  <table>
+    <tr><th>Window size</th><th>Improvement</th></tr>
+    <tr><td>1</td><td>-0%</td></tr>
+    <tr><td>2</td><td>-49%</td></tr>
+    <tr><td>3</td><td>-64%</td></tr>
+    <tr><td>4</td><td>-70%</td></tr>
+    <tr><td>5</td><td>-73%</td></tr>
+    <tr><td>6</td><td>-76%</td></tr>
+  </table>
+  
+  Take into account that with a bigger window more elements must be sorted (remember that UDP doesn't sort the incoming packets). This doesn't slow down the transfer very much but instead it requires more CPU. A window size of 4 is a good trade between speed and CPU usage.
+  
+  Right now a window size of 6 is the maximum in Windows due to the [packet loss](#udploss). With a window size of 7 or greater a lot of timeouts and retransmissions begin to occur, so the recommendation is to use with a window size of 4, the default value.
 - __retries__ - _Number_  
   How many retries must be done before emitting an error. Default is 3.
 - __timeout__ - _Number_  
