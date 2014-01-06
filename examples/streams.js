@@ -4,11 +4,11 @@ var fs = require ("fs");
 var ntftp = require ("../lib");
 
 /*
-Note: Wrapping a GetStream or a PutStream in a function and use a WriteStream as
-a destination or a ReadStream as a source is not necessary. Use the functions
-client.get() and client.put(). This example only shows how to handle the errors
-and how to abort a transfer when you need to use the streams with other sources
-or destinations.
+Note: Wrapping a GetStream or a PutStream in a function and use a fs.WriteStream
+as a destination or a fs.ReadStream as a source is not necessary. Use the
+functions client.get() and client.put(). This example only shows how to handle
+the errors and how to abort a transfer when you need to use the streams with
+other sources or destinations.
 */
 
 var client = ntftp.createClient ();
