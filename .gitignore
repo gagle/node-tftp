@@ -1,10 +1,4 @@
 node_modules
-client
-Serva
-server
-tftpd64.400
+test
 t.js
-c.js
-s.js
-random.js
-compare.js
+todo
