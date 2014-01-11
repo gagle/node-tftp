@@ -206,31 +206,33 @@ Options:
   How many retries must be done before emitting an error. Default is 3.
 - __timeout__ - _Number_  
   Milliseconds to wait before a retry. Default is 3000.
-- __userExtensions__ - _Object_  
-  Custom extensions to send along with a GET or PUT operation. For example:
-
-  ```
-  {
-    foo: "bar",
-    num: 2
-  }
-  ```
-  
-  The server may ignore or not these extensions, they are server-dependent. Please note that the TFTP algorithm cannot be modified, these extensions must be related with something else. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
-  
-  The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
   
 ---
 
 <a name="client"></a>
 __Client__
 
+Each of the following methods takes an `options` parameter. One option available is `userExtensions`, an object with properties to send along with a GET or PUT operation. For example:
+
+```javascript
+var options = {
+  userExtensions: {
+    foo: "bar",
+    num: 2
+  }
+}
+```
+  
+The server may ignore or not these extensions, this feature is server-dependent. Please note that the TFTP algorithm cannot be modified, these extensions must be related with something else. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
+  
+The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
+
 __Methods__
 
 - [Client#createGetStream(remoteFile[, options]) : GetStream](#client_creategetstream)
 - [Client#createPutStream(remoteFile, options) : PutStream](#client_createputstream)
 - [Client#get(remoteFile[, localFile][, options], callback) : undefined](#client_get)
-- [Client#put(localFile[, remoteFile], callback) : undefined](#client_put)
+- [Client#put(localFile[, remoteFile][, options], callback) : undefined](#client_put)
 
 <a name="client_creategetstream"></a>
 __Client#createGetStream(remoteFile[, options]) : GetStream__
@@ -243,6 +245,8 @@ Options:
   MD5 sum for validating the integrity of the file.
 - __sha1sum__ - _String_  
   SHA1 sum for validating the integrity of the file.
+- __userExtensions__ - _Object_  
+  Custom extensions to send with the request. [More information](#client).
 
 ```javascript
 var get = client.createGetStream ("file");
@@ -257,6 +261,8 @@ Options:
 
 - __size__ - _String_  
   Total size of the file to upload. This option is required.
+- __userExtensions__ - _Object_  
+  Custom extensions to send with the request. [More information](#client).
 
 ```javascript
 var put = client.createPutStream ("file", { size: 1234 });
@@ -273,6 +279,8 @@ Options:
   MD5 sum for validating the integrity of the file.
 - __sha1sum__ - _String_  
   SHA1 sum for validating the integrity of the file.
+- __userExtensions__ - _Object_  
+  Custom extensions to send with the request. [More information](#client).
 
 ```javascript
 //tftp://<hostname>/file -> file
@@ -283,9 +291,14 @@ client.get ("file", function (error){
 ```
 
 <a name="client_put"></a>
-__Client#put(localFile[, remoteFile], callback) : undefined__
+__Client#put(localFile[, remoteFile][, options], callback) : undefined__
 
 Uploads a file to the server. If the remote filename is missing the filename of the local file is used.
+
+Options:
+
+- __userExtensions__ - _Object_  
+  Custom extensions to send with the request. [More information](#client).
 
 ```javascript
 //file -> tftp://<hostname>/file
@@ -337,9 +350,9 @@ Emitted after the client negotiates the best possible configuration. When it is 
 }
 ```
 
-When the GetStream emits a `stats` event, the `size` property is not guaranteed because the server may not implement all the RFCs. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
+When the GetStream emits a `stats` event, the `size` property is not guaranteed to be a Number because the server may not implement all the RFCs. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
 
-The `userExtensions` property holds an object with the custom extensions sent by the server. Most of the TFTP servers with a GUI don't let you send custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to send custom extensions, this property will be always null.
+The `userExtensions` property holds an object with the custom extensions sent by the server in response to the custom extensions sent in the request. Most of the TFTP servers with a GUI don't let you respond with custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to respond with custom extensions, this property will be always null.
 
 ---
 

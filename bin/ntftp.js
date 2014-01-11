@@ -9,7 +9,7 @@ var url = require ("url");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
 var ntftp = require ("../lib");
-var normalizeRemote = require ("../lib/normalize-remote");
+var normalizeFilename = require ("../lib/normalize-filename");
 
 var client;
 var rl;
@@ -81,7 +81,7 @@ var normalizeGetFiles = function (remote, local){
   local = (local || remote) + "";
   
   try{
-    remote = normalizeRemote (remote);
+    remote = normalizeFilename (remote);
   }catch (error){
     throw error;
   }
@@ -97,7 +97,7 @@ var normalizePutFiles = function (local, remote){
   remote = (remote || path.basename (local)) + "";
   
   try{
-    remote = normalizeRemote (remote);
+    remote = normalizeFilename (remote);
   }catch (error){
     throw error;
   }
@@ -166,13 +166,12 @@ var main = argp.createParser ()
           createPrompt ();
         })
         .body ()
-            .text ("By default the client sends known de facto option " +
-                "extensions trying to achieve the best performance. If the " +
-                "server doesn't support these extensions, it automatically " +
+            .text ("By default, the client sends known de facto extensions " +
+                "trying to achieve the best performance. If the server " +
+                "doesn't support these extensions, it automatically " +
                 "fallbacks to a pure RFC 1350 compliant TFTP client " +
                 "implementation.\n")
-            .text ("This utility can be used from a shell or directly with " +
-                "a command.")
+            .text ("This utility can be used from a shell or with a command.")
             .text ("\nShell:")
             .text ("Arguments:", "  ")
             .columns ("    <host>[:<port>]", "The address and port of the " +
