@@ -1,10 +1,10 @@
 "use strict";
 
-var ntftp = require ("../lib");
+var tftp = require ("../../lib");
 
 //Downloads a file and at the same time uploads it again
 
-var client = ntftp.createClient ();
+var client = tftp.createClient ();
 
 var ps;
 var gs = client.createGetStream ("remote-file")

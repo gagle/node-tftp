@@ -1,0 +1,33 @@
+"use strict";
+
+var path = require ("path");
+var tftp = require ("../../lib");
+
+/*
+Allow only operations in the root directory.
+
+Note: For security reasons a request is automatically denied if it tries to
+access a directory upper than the root, eg.: "../file". Also, a PUT operation
+does NOT create the directories recursively if they don't exist,
+eg.: PUT "a/b/c/file" is valid but if "b" doesn't exist, the request fails, that
+is, "c" is not automatically created, the user is responsible to create the
+directory levels.
+*/
+
+var server = tftp.createServer ({
+  port: 1234
+}, function (req, res){
+  //root is "."
+  if (path.dirname (req.path) !== this.root) return req.abort ();
+  
+  //Call the default request listener
+  this.requestListener (req, res);
+});
+
+server.on ("error", function (error){
+  //Errors from the main socket and from each request
+  //These errors are not related with the protocol errors, they are I/O errors
+  console.error (error);
+});
+
+server.listen ();

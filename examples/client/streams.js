@@ -1,7 +1,7 @@
 "use strict";
 
 var fs = require ("fs");
-var ntftp = require ("../lib");
+var tftp = require ("../../lib");
 
 /*
 Note: Wrapping a GetStream or a PutStream in a function and use a fs.WriteStream
@@ -11,7 +11,7 @@ the errors and how to abort a transfer when you need to use the streams with
 other sources or destinations.
 */
 
-var client = ntftp.createClient ();
+var client = tftp.createClient ();
 
 var get = function (remote, local, cb){
   var wsError;
