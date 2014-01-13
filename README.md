@@ -199,7 +199,7 @@ Options:
     <tr><td>6</td><td>-76%</td></tr>
   </table>
   
-  Take into account that with a bigger window more elements must be sorted (remember that UDP doesn't sort the incoming packets). This doesn't slow down the transfer very much but instead it requires more CPU. A window size of 4 is a good trade between speed and CPU usage.
+  Take into account that with a bigger window more elements must be sorted (remember that UDP doesn't sort the incoming packets). This doesn't slow down the transfer very much but it requires more CPU. A window size of 4 is a good trade between transfer speed and CPU usage.
   
   Right now a window size of 6 is the maximum in Windows due to the [packet loss](#udploss). With a window size of 7 or greater a lot of timeouts and retransmissions begin to occur, so the recommendation is to use a window size of 4, the default value.
 - __retries__ - _Number_  
