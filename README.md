@@ -241,6 +241,8 @@ Returns a new [GetStream](#getstream_putstream) instance.
 
 Options:
 
+- __highWaterMark__ - _Number_  
+  Buffer size. Default is 16KB.
 - __md5sum__ - _String_  
   MD5 sum for validating the integrity of the file.
 - __sha1sum__ - _String_  
@@ -259,6 +261,8 @@ Returns a new [PutStream](#getstream_putstream) instance.
 
 Options:
 
+- __highWaterMark__ - _Number_  
+  Buffer size. Default is 16KB.
 - __size__ - _String_  
   Total size of the file to upload. This option is required.
 - __userExtensions__ - _Object_  
@@ -275,6 +279,8 @@ Downloads a file from the server. If the local filename is missing the filename 
 
 Options:
 
+- __highWaterMark__ - _Number_  
+  Buffer size. Default is 16KB.
 - __md5sum__ - _String_  
   MD5 sum for validating the integrity of the file.
 - __sha1sum__ - _String_  
@@ -297,6 +303,8 @@ Uploads a file to the server. If the remote filename is missing the filename of 
 
 Options:
 
+- __highWaterMark__ - _Number_  
+  Buffer size. Default is 16KB.
 - __userExtensions__ - _Object_  
   Custom extensions to send with the request. [More information](#client).
 

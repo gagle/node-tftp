@@ -1,4 +1,8 @@
-v0.0.3 (xx Jan 2014)
+v0.0.4 (13 Jan 2014)
+  Added "highWaterMark" option to "get()", "put()", "createGetStream()" and
+    "createPutStream()".
+
+v0.0.3 (11 Jan 2014)
   If the server send unknown extensions now the client fails correctly.
   The "userExtensions" property has been moved from "createClient()" to "get()",
     "put()", "createGetStream()" and "createPutStream()".
