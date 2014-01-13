@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "argp": "1.0.x",
-    "dynamic-inheritance": "0.1.x",
     "status-bar": "1.1.x"
   },
   "bin": {
