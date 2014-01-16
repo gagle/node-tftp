@@ -14,7 +14,6 @@ var server = tftp.createServer ({
 
 server.on ("error", function (error){
   //Errors from the main socket and from each request
-  //These errors are not related with the protocol errors, they are I/O errors
   console.error (error);
 });
 

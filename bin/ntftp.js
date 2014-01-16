@@ -10,6 +10,7 @@ var argp = require ("argp");
 var statusBar = require ("status-bar");
 var ntftp = require ("../lib");
 var normalizeFilename = require ("../lib/normalize-filename");
+var errors = require ("../lib/protocol/errors");
 
 var client;
 var rl;
@@ -516,7 +517,7 @@ function get (remote, local, cb){
     read.ws = fs.createWriteStream (local)
         .on ("error", function (error){
           read.error = error;
-          read.gs.abort ();
+          read.gs.abort (errors.EIO);
         })
         .on ("finish", function (){
           read = null;
@@ -553,7 +554,7 @@ function put (local, remote, cb){
     write.rs = fs.createReadStream (local)
         .on ("error", function (error){
           write.error = error;
-          write.ps.abort ();
+          write.ps.abort (errors.EIO);
         });
     
     write.ps = client.createPutStream (remote, { size: stats.size })

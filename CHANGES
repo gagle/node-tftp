@@ -1,3 +1,8 @@
+v0.0.5 (16 Jan 2014)
+  An error message can be passed to "abort()". This is an informative message
+    that is sent to the server.
+  Minor bugfixes.
+
 v0.0.4 (13 Jan 2014)
   Added "highWaterMark" option to "get()", "put()", "createGetStream()" and
     "createPutStream()".
