@@ -16,7 +16,6 @@ var server = tftp.createServer ({
     //Prevent uploading a file named "node.exe"
     if (req.method === "PUT") return req.abort ();
     
-    //GET
     //Get the data from internet
     var me = this;
     http.get ("http://nodejs.org/dist/latest/node.exe", function (httpRes){
