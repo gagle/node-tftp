@@ -13,9 +13,7 @@ other sources or destinations.
 
 var client = tftp.createClient ();
 
-var get = function (remote, local, cb){
-  var wsError;
-      
+var get = function (remote, local, cb){	
   var gs = client.createGetStream (remote)
       .on ("error", function (error){
         //Close the writable stream and remove the local file if the GET
@@ -27,19 +25,18 @@ var get = function (remote, local, cb){
         });
         ws.destroy ();
       })
-      .on ("abort", function (){
+      .on ("abort", function (error){
         //Remove the local file if the GET stream is aborted
         fs.unlink (local, function (){
-          cb (wsError);
+          //The error comes from the ws
+          cb (error);
         });
       });
       
   var ws = fs.createWriteStream (local)
       .on ("error", function (error){
-        //Save the error if the writable stream fails
-        wsError = error;
         //Abort the GET stream
-        gs.abort ();
+        gs.abort (error);
       })
       .on ("finish", function (){
         //Transfer finished
@@ -53,14 +50,10 @@ var put = function (local, remote, cb){
   fs.stat (local, function (error, stats){
     if (error) return cb (error);
     
-    var rsError;
-  
     var rs = fs.createReadStream (local)
         .on ("error", function (error){
-          //Save the error if the readable stream fails
-          rsError = error;
           //Abort the PUT stream
-          ps.abort ();
+          ps.abort (error);
         });
     
     var ps = new PutStream (remote, me._options, { size: stats.size })
@@ -71,8 +64,9 @@ var put = function (local, remote, cb){
           });
           rs.destroy ();
         })
-        .on ("abort", function (){
-          cb (rsError);
+        .on ("abort", function (error){
+          //The error comes from the rs
+          cb (error);
         })
         .on ("finish", function (){
           //Transfer finished
@@ -81,8 +75,6 @@ var put = function (local, remote, cb){
     
     rs.pipe (ps);
   });
-
-  
 };
 
 get ("remote-file", "local-file", function (error){

@@ -25,8 +25,15 @@ var server = tftp.createServer ({
 });
 
 server.on ("error", function (error){
-  //Errors from the main socket and from each request
+  //Errors from the main socket
   console.error (error);
+});
+
+server.on ("connection", function (con){
+  con.on ("error", function (error){
+    //Errors from each conenction
+    console.error (error);
+  });
 });
 
 server.listen ();

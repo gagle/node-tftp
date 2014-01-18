@@ -23,8 +23,10 @@ var server = tftp.createServer ({
       //they are sent back to client via tftp
       httpRes.pipe (tftpRes);
     }).on ("error", function (error){
-      //Redirect the errors to the server error handler
-      me.emit ("error", error);
+      req.on ("abort", function (){
+        //Redirect the errors to the request error handler
+        req.emit ("error", error);
+      });
       req.abort ();
     });
   }else{
@@ -34,8 +36,15 @@ var server = tftp.createServer ({
 });
 
 server.on ("error", function (error){
-  //Errors from the main socket and from each request
+  //Errors from the main socket
   console.error (error);
+});
+
+server.on ("connection", function (con){
+  con.on ("error", function (error){
+    //Errors from each conenction
+    console.error (error);
+  });
 });
 
 server.listen ();
