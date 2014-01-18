@@ -7,7 +7,6 @@ socket: localhost:1234, root: ".", only GET
 */
 
 var server = tftp.createServer ({
-  //port 69 requires admin privileges
   port: 1234,
   denyPUT: true
 });
