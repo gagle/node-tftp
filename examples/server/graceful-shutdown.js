@@ -3,7 +3,9 @@
 var tftp = require ("../../lib");
 
 /*
-Closes the server and all the current connections gracefully.
+This examples demonstrates how to close the server and all the current
+connections gracefully.
+
 This is slightly different from the http server where the "connection" event
 returns the socket and you must call to socket.destroy() to close it. On the
 other hand, this tftp server returns the GetStream, the "req" parameter of the
