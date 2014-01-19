@@ -16,7 +16,7 @@ var server = tftp.createServer (function (req, res){
     res.setUserExtensions ({ num: parseFloat (stats.userExtensions.num) - 1 });
   });
   this.requestListener (req, res);
-})
+});
 server.listen ();
 
 fs.openSync ("tmp1", "w");

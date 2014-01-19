@@ -22,7 +22,7 @@ var server = tftp.createServer (function (req, res){
     }
   });
   this.requestListener (req, res);
-})
+});
 server.listen ();
 
 fs.openSync ("tmp1", "w");
