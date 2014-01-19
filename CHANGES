@@ -14,7 +14,7 @@ v0.0.4 (13 Jan 2014)
     "createPutStream()".
 
 v0.0.3 (11 Jan 2014)
-  If the server send unknown extensions now the client fails correctly.
+  If the server sends unknown extensions now the client fails correctly.
   The "userExtensions" property has been moved from "createClient()" to "get()",
     "put()", "createGetStream()" and "createPutStream()".
   Fixed error while retransmitting a bad request.

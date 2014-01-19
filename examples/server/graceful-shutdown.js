@@ -23,7 +23,6 @@ var connections = [];
 
 var server = tftp.createServer ();
 
-//Listen for connection events
 server.on ("connection", function (con){
   //Save the connection
   connections.push (con);
@@ -42,11 +41,17 @@ server.on ("connection", function (con){
 server.listen ();
 
 var closed = false;
+
 setTimeout (function (){
   //Close the server after 10s
   server.on ("close", function (){
     closed = true;
-    //Abort all the current connections
+    
+    if (!connections.length){
+      return console.log ("Server closed");
+    }
+    
+    //Abort all the current transfers
     for (var i=0; i<connections.length; i++){
       console.log ("Connection " + i + " aborted");
       connections[i].abort ();
