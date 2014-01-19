@@ -30,7 +30,7 @@ server.on ("connection", function (con){
   //The "close" event is fired when the internal socket closes, regardless
   //whether it is produced by an error or because the socket closes naturally
   con.on ("close", function (){
-    //Remove the connection when it closes
+    //Remove the connection
     connections.splice (connections.indexOf (con), 1);
     if (closed && !connections.length){
       //The server and all the connections have been closed
