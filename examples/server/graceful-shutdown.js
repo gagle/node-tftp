@@ -8,13 +8,12 @@ connections gracefully.
 
 This is slightly different from the http server where the "connection" event
 returns the socket and you must call to socket.destroy() to close it. On the
-other hand, this tftp server returns the GetStream, the "req" parameter of the
-request listener, or simply a "connection". When connection.abort() is called
-it sends to the client an error message and the server closes the socket, that
-is, it's a real graceful shutdown. Instead of killing the socket by brute force,
-the server informs to the client that the transfer has been aborted, so the
-client is able to abort the transfer immediately instead of begin a timeout and
-then abort.
+other hand, this tftp server returns the "req" parameter of the request
+listener, or simply a "connection". When connection.abort() is called it sends
+to the client an error message and the server closes the socket, that is, it's a
+real graceful shutdown. Instead of killing the socket by brute force, the server
+informs to the client that the transfer has been aborted, so the client is able
+to abort the transfer immediately instead of begin a timeout and then abort.
 
 The internal socket is not exposed to the public access.
 */
