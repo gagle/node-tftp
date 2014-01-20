@@ -410,6 +410,25 @@ Aborts the current transfer and emits an `abort` event.
 __Global installation__
 
 
+```
+npm install tftp -g
+```
+
+Then you can access to the `ntftp` binary.
+
+Use the `-l|--listen[=ROOT]` option to start the server. By default the root directory is `.`.
+
+```
+$ ntftp [options] <host>[:<port>] -l|--listen=ROOT
+```
+
+For example:
+
+```
+$ ntftp localhost -l
+```
+
+This command starts a server listening on `localhost:69` and root `.`.
 
 ---
 
