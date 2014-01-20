@@ -512,14 +512,14 @@ Emitted when a new request has been received. All the connection objects that ar
 
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
-This event is emitted after some minor validations. If the path is directory or the user tries to access a path from outside the root directory, the request fails. Furthermore, in the case of GET operations, the request automatically sends an error if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
+This event is emitted after some minor validations. If the path is directory or the user tries to access a file outside the root directory (eg.: `../file`), the request fails. Furthermore, in the case of GET operations, the request automatically sends an error to the client if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
 
 ---
 
 <a name="server_close"></a>
 __close() : undefined__
 
-Closes the server and stops receiving new connections.
+Closes the server and stops accepting new connections.
 
 ---
 
@@ -540,12 +540,12 @@ This function must NOT be called from outside a `request` listener. This functio
 <a name="server_getstream_putstream"></a>
 __GetStream and PutStream__
 
-When the `request` event is emitted, a new GetStream and PutStream instances are created. These streams are similar to the [streams](#client_getstream_putstream) used in the client but with one difference. The GetStream (`req`) acts like the "connection" object. All the events from the PutStream (`res`) are forwarded to the `req` object, so you don't need to attach any event to the `res` object.
+When the `request` event is emitted, a new GetStream and PutStream instances are created. These streams are similar to the [streams](#client_getstream_putstream) used in the client but with one difference, the GetStream (`req`) acts like a "connection" object. All the events from the PutStream (`res`) are forwarded to the `req` object, so you don't need to attach any event to the `res` object.
 
 The GetStream has two additional properties:
 
 - __method__ - _String_  
-  The transfer's method. `GET` or `PUT`.
+  The transfer's method: `GET` or `PUT`.
 - __file__ - _String_  
   The path of the file. The directories are not created recursively if they don't exist.
 
@@ -553,7 +553,7 @@ The PutStream has one additional method:
 
 - __setUserExtensions(userExtensions) : undefined__
 
-  Sets the user extensions to send back to the client in response to the received user extensions. You cannot send extensions different from the ones that are sent by the user.
+  Sets the user extensions to send back to the client in response to the received ones. You cannot send extensions different from the ones that are sent by the client.
   
   As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
   
