@@ -12,6 +12,13 @@ this case via http.
 var server = tftp.createServer ({
   port: 1234
 }, function (req, tftpRes){
+  req.on ("error", function (error){
+    //Errors from the connection
+    //The errors from the response are forwarded to the error listener of the
+    //request
+    console.error (error);
+  });
+
   if (req.file === "node.exe"){
     //Prevent uploading a file named "node.exe"
     if (req.method === "PUT") return req.abort ();
@@ -38,13 +45,6 @@ var server = tftp.createServer ({
 server.on ("error", function (error){
   //Errors from the main socket
   console.error (error);
-});
-
-server.on ("connection", function (con){
-  con.on ("error", function (error){
-    //Errors from each conenction
-    console.error (error);
-  });
 });
 
 server.listen ();

@@ -26,6 +26,8 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `mail` and `netascii` transfer modes ✗
 
+[CLIENT](#client) | [SERVER](#server)
+
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
 However, there are two de facto extensions that can boost the transfer speed and remove the size limit: the rollover and the window.
@@ -43,24 +45,26 @@ Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) applicatio
 
 Currently, in Windows there is a problem concerning the buffering of the received network packets ([#6696](https://github.com/joyent/node/issues/6696)). Basically, when the buffer is full, all the subsequent incoming packets are dropped, so they are never consumed by Node.js. This scenario can be reproduced by configuring a window bigger than 6 blocks with the default block size. So the advice is: do NOT increment the default window size (4) in the Windows platform until this bug is solved.
 
+---
+
 ### CLIENT ###
 
 [_module_.createClient([options]) : Client](#createclient)
 
 #### Documentation ####
 
-- [Streams](#streams)
-- [Global installation](#global)
+- [Streams](#client_streams)
+- [Global installation](#client_global)
 
 #### Objects ####
 
 - [Client](#client_object)
-- [GetStream](#getstream)
-- [PutStream](#putstream)
+- [GetStream](#client_getstream_putstream)
+- [PutStream](#client_getstream_putstream)
 
 ---
 
-<a name="streams"></a>
+<a name="client_streams"></a>
 __Streams__
 
 For the sake of simplicity the following examples omit the error handling. See the [streams.js](https://github.com/gagle/node-tftp/blob/master/examples/client/streams.js) example or the [source code](https://github.com/gagle/node-tftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
@@ -85,7 +89,7 @@ read.pipe (put);
 
 ---
 
-<a name="global"></a>
+<a name="client_global"></a>
 __Global installation__
 
 ```
@@ -156,9 +160,9 @@ var client = tftp.createClient ({
 Options:
 
 - __hostname__ - _String_  
-  The hostname. Default is `localhost`.
+  The address. Default is `localhost`.
 - __port__ - _Number_  
-  The port number. Default is 69.
+  The port. Default is 69.
 - __blockSize__ - _Number_  
   The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468, the MTU size before IP fragmentation in Ethernet networks.
 - __windowSize__ - _Number_  
@@ -214,7 +218,7 @@ __Methods__
 <a name="client_creategetstream"></a>
 __Client#createGetStream(remoteFile[, options]) : GetStream__
 
-Returns a new [GetStream](#getstream_putstream) instance.
+Returns a new [GetStream](#client_getstream_putstream) instance.
 
 Options:
 
@@ -234,7 +238,7 @@ var get = client.createGetStream ("file");
 <a name="client_createputstream"></a>
 __Client#createPutStream(remoteFile, options) : PutStream__
 
-Returns a new [PutStream](#getstream_putstream) instance.
+Returns a new [PutStream](#client_getstream_putstream) instance.
 
 Options:
 
@@ -295,43 +299,69 @@ client.put ("file", function (error){
 
 ---
 
-<a name="getstream_putstream"></a>
+<a name="client_getstream_putstream"></a>
 __GetStream and PutStream__
 
 The GetStream inherits from a Readable stream and the PutStream from a Writable stream.
 
 __Events__
 
-- [abort](#event_abort)
-- [close](#event_close)
-- [error](#event_error)
-- [stats](#event_stats)
+- [abort](#client_event_abort)
+- [close](#client_event_close)
+- [end](#client_event_end)
+- [error](#client_event_error)
+- [finish](#client_event_finish)
+- [stats](#client_event_stats)
 
 __Methods__
 
-- [abort() : undefined](#getstream_putstream_abort)
+- [abort() : undefined](#client_getstream_putstream_abort)
 
 ---
 
-<a name="event_abort"></a>
+<a name="client_event_abort"></a>
 __abort__
 
-Emitted when [abort()](getstream_putstream_abort) is called and the transfer has been aborted. Is emitted after the `close` event.
+Arguments: none.
 
-<a name="event_close"></a>
+Emitted when [abort()](#client_getstream_putstream_abort) is called and the transfer has been aborted.
+
+<a name="client_event_close"></a>
 __close__
+
+Arguments: none.
 
 Emitted when the underlying socket has been closed. It is emitted __always__ and before any other event (`error`, `abort`, `end` or `finish`).
 
-<a name="event_error"></a>
+<a name="client_event_end"></a>
+__end__
+
+Arguments: none.
+
+Emitted by the GetStream when the file download finishes. 
+
+<a name="client_event_error"></a>
 __error__
 
-Emitted when an error occurs. The stream is automatically closed and is emitted after the `close` event.
+Arguments: `error`.
 
-<a name="event_stats"></a>
+Emitted when an error occurs. The stream is closed automatically.
+
+<a name="client_event_finish"></a>
+__finish__
+
+Arguments: none.
+
+Emitted by the PutStream when the file upload finishes. 
+
+<a name="client_event_stats"></a>
 __stats__
 
-Emitted when the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun. It returns an object similar to this:
+Arguments: `stats`.
+
+Emitted when the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun.
+
+`stats` is an object similar to this:
 
 ```
 {
@@ -342,18 +372,20 @@ Emitted when the client negotiates the best possible configuration. When it is e
   file: 'file',
   retries: 3,
   timeout: 3000,
-  localSocket: { address: "0.0.0.0", port: 55146 },
-  remoteSocket: { address: "127.0.0.1", port: 55147 }
+  localAddress: "0.0.0.0",
+  localPort: 55146,
+  remoteAddress: "127.0.0.1",
+  remotePort: 55147
 }
 ```
 
 When the GetStream emits a `stats` event, the `size` property is not guaranteed to be a Number because the server may not implement all the RFCs. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
 
-The `userExtensions` property holds an object with the custom extensions sent by the server in response to the custom extensions sent with the request. Most of the TFTP servers don't let you respond with custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to respond with custom extensions, this property will be always null. Of course, the server provided by this module and created with [createServer()](#createserver) let you set user extensions.
+The `userExtensions` property holds an object with the custom extensions sent by the server in response to the custom extensions sent with the request. Most of the TFTP servers don't let you respond with custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to respond with custom extensions, this property will be always null. Of course, the server included with this module let you set the user extensions to send back to the client.
 
 ---
 
-<a name="getstream_putstream_abort"></a>
+<a name="client_getstream_putstream_abort"></a>
 __abort() : undefined__
 
 Aborts the current transfer and emits an `abort` event.
@@ -363,3 +395,110 @@ Aborts the current transfer and emits an `abort` event.
 ### SERVER ###
 
 [_module_.createServer([options][, requestListener]) : Server](#createserver)
+
+#### Documentation ####
+
+- [Global installation](#server_global)
+
+#### Objects ####
+
+- [Server](#server_object)
+- [GetStream](#server_getstream_putstream)
+- [PutStream](#server_getstream_putstream)
+
+---
+
+<a name="server_global"></a>
+__Global installation__
+
+
+
+---
+
+<a name="createserver"></a>
+___module_.createServer([options][, requestListener]) : Server__
+
+Returns a new [Server](#server_object) instance.
+
+```javascript
+var server = tftp.createServer ({
+  hostname: "10.10.10.10",
+  port: 1234,
+  root: "path/to/root/dir",
+  denyPUT: true
+});
+```
+
+The `requestListener` is a function which is automatically added to the [request](#server_event_request) event.
+
+Options:
+
+It has the same options as the [createClient()](#createclient) function with the addition of:
+
+- __root__ - _String_  
+  The root directory. Default is `.`.
+- __denyGET__ - _Boolean_  
+  Denies all the GET operations. Default is false.
+- __denyPUT__ - _Boolean_  
+  Denies all the PUT operations. Default is false.
+
+Setting the options `denyGET` or `denyPUT` are more efficient than aborting the request from inside the request listener.
+
+---
+
+<a name="server_object"></a>
+__Server__
+
+__Events__
+
+- [close](#server_event_close)
+- [connection](#server_event_connection)
+- [error](#server_event_error)
+- [listening](#server_event_listening)
+- [request](#server_event_request)
+
+__Methods__
+
+- [close() : undefined](#server_abort)
+- [listen() : undefined](#server_listen)
+- [requestListener() : undefined](#server_requestListener)
+
+---
+
+<a name="server_event_close"></a>
+__close__
+
+Arguments: none.
+
+Emitted when the server closes. No new requests are accepted. Note that the current transfers are not aborted. If you need to close the server gracefully, look at [this](https://github.com/gagle/node-tftp/blob/master/examples/server/graceful-shutdown.js) example.
+
+<a name="server_event_error"></a>
+__error__
+
+Arguments: `error`.
+
+Emitted when an error occurs receiving data. The server is not closed.
+
+<a name="server_event_listening"></a>
+__listening__
+
+Arguments: none.
+
+Emitted when the server has been bound after calling [listen()](#server_listen).
+
+<a name="server_event_request"></a>
+__request__
+
+Arguments: `req`, `res`.
+
+Emitted when a new request has been received. All the connection objects that are emitted can be aborted at any time.
+
+`req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
+
+This event is emitted after some minimal validations. In the case of GET operations, the request automatically sends an error if the file doesn't exists, so if you use a custom request listener, you don't need to check if the file exists because this check was already done. If the file is in fact a directory the request also sends an error.
+
+---
+
+<a name="server_getstream_putstream"></a>
+__GetStream and PutStream__
+

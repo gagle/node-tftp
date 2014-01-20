@@ -1,6 +1,8 @@
-v0.0.6 (xx Jan 2014)
+v0.0.6 (20 Jan 2014)
   Server implemented along with a major refactor of the client.
-  Fixed the reception of user extensions in the client sent by the server.
+  Fixed the reception of user extensions sent by the server.
+  Added the server setup in the cli script.
+  Changed the sockets of the stats object.
   Minor tweaks, checks and bugfixes.
 
 v0.0.5 (16 Jan 2014)

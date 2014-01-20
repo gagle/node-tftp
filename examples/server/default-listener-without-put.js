@@ -16,9 +16,11 @@ server.on ("error", function (error){
   console.error (error);
 });
 
-server.on ("connection", function (con){
-  con.on ("error", function (error){
-    //Errors from each conenction
+server.on ("request", function (req){
+  req.on ("error", function (error){
+    //Errors from the connection
+    //The errors from the response are forwarded to the error listener of the
+    //request
     console.error (error);
   });
 });
