@@ -512,7 +512,7 @@ Emitted when a new request has been received. All the connection objects that ar
 
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
-This event is emitted after some minimal validations. If the path is directory or the user tries to access a path from outside the root directory, the request fails. Furthermore, in the case of GET operations, the request automatically sends an error if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
+This event is emitted after some minor validations. If the path is directory or the user tries to access a path from outside the root directory, the request fails. Furthermore, in the case of GET operations, the request automatically sends an error if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
 
 ---
 
