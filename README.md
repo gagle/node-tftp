@@ -549,18 +549,12 @@ The GetStream has two additional properties:
 - __file__ - _String_  
   The path of the file. The directories are not created recursively if they don't exist.
 
-Method:
-
-__abort() : undefined__
-
-Aborts the the transfer.
-
 The PutStream has one additional method:
 
-__setUserExtensions(userExtensions) : undefined__
+- __setUserExtensions(userExtensions) : undefined__
 
-Sets the user extensions to send back to the client in response to the received user extensions. You cannot send extensions different from the ones that are sent by the user.
-
-As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
-
-Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
+  Sets the user extensions to send back to the client in response to the received user extensions. You cannot send extensions different from the ones that are sent by the user.
+  
+  As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
+  
+  Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
