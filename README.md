@@ -402,8 +402,7 @@ Aborts the current transfer and emits an `abort` event.
 #### Objects ####
 
 - [Server](#server_object)
-- [GetStream](#server_getstream_putstream)
-- [PutStream](#server_getstream_putstream)
+- [GetStream and PutStream](#server_getstream_putstream)
 
 ---
 
