@@ -59,8 +59,7 @@ Currently, in Windows there is a problem concerning the buffering of the receive
 #### Objects ####
 
 - [Client](#client_object)
-- [GetStream](#client_getstream_putstream)
-- [PutStream](#client_getstream_putstream)
+- [GetStream and PutStream](#client_getstream_putstream)
 
 ---
 
@@ -459,9 +458,9 @@ __Events__
 
 __Methods__
 
-- [close() : undefined](#server_abort)
+- [close() : undefined](#server_close)
 - [listen() : undefined](#server_listen)
-- [requestListener() : undefined](#server_requestListener)
+- [requestListener(req, res) : undefined](#server_requestlistener)
 
 ---
 
@@ -495,10 +494,55 @@ Emitted when a new request has been received. All the connection objects that ar
 
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
-This event is emitted after some minimal validations. In the case of GET operations, the request automatically sends an error if the file doesn't exists, so if you use a custom request listener, you don't need to check if the file exists because this check was already done. If the file is in fact a directory the request also sends an error.
+This event is emitted after some minimal validations. If the path is directory or the user tries to access a path from outside the root directory, the request fails. Furthermore, in the case of GET operations, the request automatically sends an error if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
+
+---
+
+<a name="server_close"></a>
+__close() : undefined__
+
+Closes the server and stops receiving new connections.
+
+---
+
+<a name="server_listen"></a>
+__listen() : undefined__
+
+Starts accepting new connections.
+
+---
+
+<a name="server_requestlistener"></a>
+__requestListener(req, res) : undefined__
+
+This function must NOT be called from outside a `request` listener. This function is the default request listener, it automatically handles the GET and PUT requests.
 
 ---
 
 <a name="server_getstream_putstream"></a>
 __GetStream and PutStream__
 
+When the `request` event is emitted, a new GetStream and PutStream instances are created. These streams are similar to the [streams](#client_getstream_putstream) used in the client but with one difference. The GetStream (`req`) acts like the "connection" object. All the events from the PutStream (`res`) are forwarded to the `req` object, so you don't need to attach any event to the `res` object.
+
+The GetStream has two additional properties:
+
+- __method__ - _String_  
+  The transfer's method. `GET` or `PUT`.
+- __file__ - _String_  
+  The path of the file. The directories are not created recursively if they don't exist.
+
+Method:
+
+__abort() : undefined__
+
+Aborts the the transfer.
+
+The PutStream has one additional method:
+
+__setUserExtensions(userExtensions) : undefined__
+
+Sets the user extensions to send back to the client in response to the received user extensions. You cannot send extensions different from the ones that are sent by the user.
+
+As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
+
+Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.

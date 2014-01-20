@@ -8,7 +8,7 @@ var readLine = require ("readline");
 var url = require ("url");
 var argp = require ("argp");
 var statusBar = require ("status-bar");
-var ntftp = require ("../lib");
+var tftp = require ("../lib");
 var normalizeFilename = require ("../lib/normalize-filename");
 var errors = require ("../lib/protocol/errors");
 
@@ -126,7 +126,7 @@ var setMainParserOptions = function (body){
       .option ({ short: "w", long: "windowsize", metavar: "SIZE",
           type: Number, description: "Sets the windowsize option. Valid " +
           "range: [1, 65535]. Default is 4" })
-      .help ();
+      .help ()
 };
 
 var setMainCommandBody = function (body){
@@ -163,8 +163,12 @@ var main = argp.createParser ()
         })
         .on ("end", function (argv){
           if (!argv.server) this.printHelp ();
-          createClient (argv);
-          createPrompt ();
+          if ("listen" in argv){
+            createServer (argv);
+          }else{
+            createClient (argv);
+            createPrompt ();
+          }
         })
         .body ()
             .text ("By default, the client sends known de facto extensions " +
@@ -190,6 +194,10 @@ var main = argp.createParser ()
             .text ("\nCommands:")
             .text ("get, put.", "  ")
             .text ("\n'ntftp <command> -h' for more information.", "  ")
+            .text ("\nTo start the server use the following option:")
+            .option ({ short: "l", long: "listen", metavar: "ROOT",
+                optional: true, description: "Starts the server. By default, " +
+                "the ROOT directory is '.', the current working directory." })
             .text ("\nOptions:");
 setMainParserOptions (main);
 
@@ -309,13 +317,9 @@ function createCommandParser (){
               return notifyError (error, true);
             }
           
-            get (files.remote, files.local, function (error, abort){
+            get (files.remote, files.local, function (error){
               if (error) return notifyError (error, true);
-              if (abort){
-                again ();
-              }else{
-                rl.prompt ();
-              }
+              rl.prompt ();
             });
           })
           .on ("error", function (error){
@@ -346,13 +350,9 @@ function createCommandParser (){
               return notifyError (error, true);
             }
           
-            put (files.local, files.remote, function (error, abort){
+            put (files.local, files.remote, function (error){
               if (error) return notifyError (error, true);
-              if (abort){
-                again ();
-              }else{
-                rl.prompt ();
-              }
+              rl.prompt ();
             });
           })
           .on ("error", function (error){
@@ -365,8 +365,25 @@ function createCommandParser (){
   return parser;
 };
 
+function createServer (argv){
+  tftp.createServer ({
+    root: argv.listen,
+    hostname: argv.server.hostname,
+    port: argv.server.port,
+    blockSize: argv.blksize,
+    retries: argv.retries,
+    timeout: argv.timeout,
+    windowSize: argv.windowsize
+  })
+  .on ("error", notifyError)
+  .on ("request", function (req){
+    req.on ("error", notifyError);
+  })
+  .listen ();
+};
+
 function createClient (argv){
-  client = ntftp.createClient ({
+  client = tftp.createClient ({
     hostname: argv.server.hostname,
     port: argv.server.port,
     blockSize: argv.blksize,
