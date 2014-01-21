@@ -1,5 +1,6 @@
-v0.0.8 (x Jan 2014)
-  Server: Allow aborting a request witohout calling the default requestListener.
+v0.0.8 (21 Jan 2014)
+  Server: Allow aborting a request witohout calling the default request
+    listener.
   Minor internal refactor.
 
 v0.0.7 (20 Jan 2014)
