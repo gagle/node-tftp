@@ -26,7 +26,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `mail` and `netascii` transfer modes ✗
 
-[CLIENT](#client) | [SERVER](#server)
+[CLIENT](#client) | [SERVER](#server) | [GUI](#gui)
 
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
@@ -558,3 +558,7 @@ The PutStream has one additional method:
   As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
   
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
+
+### GUI ###
+
+Coming soon (powered by node-webkit)...
