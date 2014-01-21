@@ -387,7 +387,7 @@ The `userExtensions` property holds an object with the custom extensions sent by
 <a name="client_getstream_putstream_abort"></a>
 __abort() : undefined__
 
-Aborts the current transfer and emits an `abort` event.
+Aborts the current transfer.
 
 ---
 
