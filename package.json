@@ -4,7 +4,7 @@
   "description": "Streaming TFTP client and server",
   "keywords": ["tftp", "client", "stream"],
   "author": "Gabriel Llamas <gagle@outlook.com>",
-  "repository": "git://github.com/gagle/node-tftp-client.git",
+  "repository": "git://github.com/gagle/node-tftp.git",
   "engines": {
     "node": ">=0.10"
   },
