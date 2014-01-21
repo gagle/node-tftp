@@ -558,9 +558,3 @@ The PutStream has one additional method:
   As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
   
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
-
----
-
-### GUI ###
-
-Coming soon (powered by node-webkit)...
