@@ -539,6 +539,8 @@ __requestListener(req, res) : undefined__
 
 This function must NOT be called from outside a `request` listener. This function is the default request listener, it automatically handles the GET and PUT requests.
 
+---
+
 <a name="server_root"></a>
 __root__
 
