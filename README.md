@@ -151,14 +151,14 @@ Returns a new [Client](#client_object) instance.
 
 ```javascript
 var client = tftp.createClient ({
-  hostname: "10.10.10.10",
+  host: "10.10.10.10",
   port: 1234
 });
 ```
 
 Options:
 
-- __hostname__ - _String_  
+- __host__ - _String_  
   The address. Default is `localhost`.
 - __port__ - _Number_  
   The port. Default is 69.
@@ -269,7 +269,7 @@ Options:
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
-//tftp://<hostname>/file -> file
+//tftp://<host>/file -> file
 client.get ("file", function (error){
   if (error) return console.error (error);
   ...
@@ -289,7 +289,7 @@ Options:
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
-//file -> tftp://<hostname>/file
+//file -> tftp://<host>/file
 client.put ("file", function (error){
   if (error) return console.error (error);
   ...
@@ -439,7 +439,7 @@ Returns a new [Server](#server_object) instance.
 
 ```javascript
 var server = tftp.createServer ({
-  hostname: "10.10.10.10",
+  host: "10.10.10.10",
   port: 1234,
   root: "path/to/root/dir",
   denyPUT: true
@@ -479,6 +479,10 @@ __Methods__
 - [close() : undefined](#server_close)
 - [listen() : undefined](#server_listen)
 - [requestListener(req, res) : undefined](#server_requestlistener)
+
+__Properties__
+
+- [root](#server_root)
 
 ---
 
@@ -534,6 +538,11 @@ Starts accepting new connections.
 __requestListener(req, res) : undefined__
 
 This function must NOT be called from outside a `request` listener. This function is the default request listener, it automatically handles the GET and PUT requests.
+
+<a name="server_root"></a>
+__root__
+
+The root path.
 
 ---
 

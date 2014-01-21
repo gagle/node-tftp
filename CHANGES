@@ -1,6 +1,10 @@
+v0.0.9 (21 Jan 2014)
+  Added DNS address resolution in the client and automatic UDP socket type
+    creation (ipv4 or ipv6).
+  Renamed "hostname" option to "host".
+
 v0.0.8 (21 Jan 2014)
-  Server: Allow aborting a request witohout calling the default request
-    listener.
+  Allow aborting a request without calling the default request listener.
   Minor internal refactor.
 
 v0.0.7 (20 Jan 2014)
