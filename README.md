@@ -559,6 +559,8 @@ The PutStream has one additional method:
   
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
 
+---
+
 ### GUI ###
 
 Coming soon (powered by node-webkit)...
