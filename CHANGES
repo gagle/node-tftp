@@ -1,3 +1,6 @@
+v0.0.11 (23 Jan 2014)
+  Fixed IPv6 server socket.
+
 v0.0.10 (22 Jan 2014)
   Allow error messages with code 0 and no description.
 
