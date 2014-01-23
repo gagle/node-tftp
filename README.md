@@ -159,7 +159,7 @@ var client = tftp.createClient ({
 Options:
 
 - __host__ - _String_  
-  The address. IPv4 and IPv6 allowed as well as a domain name. Default is `localhost` (`127.0.0.1`).
+  The address. Both IPv4 and IPv6 are allowed as well as a domain name. Default is `localhost` (`127.0.0.1`).
 - __port__ - _Number_  
   The port. Default is 69.
 - __blockSize__ - _Number_  
