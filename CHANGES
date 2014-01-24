@@ -1,4 +1,4 @@
-v0.0.12 (xx Jan 2014)
+v0.0.12 (24 Jan 2014)
   Client: Fixed put stream error handling with empty files.
   Client: Improved maximum size error handling.
   Improved the error checking with DATA and ACK packets.
