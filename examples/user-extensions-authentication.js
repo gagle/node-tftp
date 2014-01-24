@@ -14,6 +14,9 @@ var users = {
 };
 
 var server = tftp.createServer (function (req, res){
+  req.on ("error", function (error){
+    console.error (error);
+  });
   req.on ("stats", function (stats){
     if (!stats.userExtensions || !stats.userExtensions.user ||
         !stats.userExtensions.pass ||
@@ -23,24 +26,15 @@ var server = tftp.createServer (function (req, res){
   });
   this.requestListener (req, res);
 });
+server.on ("error", function (error){
+  console.error (error);
+});
 server.listen ();
 
 fs.openSync ("tmp1", "w");
 
 var client = tftp.createClient ();
-client.get ("tmp1", "tmp2", function (error){
+client.put ("tmp1", "tmp2", function (error){
   //Invalid user
   console.error (error);
-  
-  client.get ("tmp1", "tmp2", { userExtensions: {
-    user: "usr1",
-    pass: "usr1-pass"
-  }}, function (error){
-    if (error) return console.error (error);
-    
-    console.log ("OK");
-    server.close ();
-    fs.unlinkSync ("tmp1");
-    fs.unlinkSync ("tmp2");
-  });
 });

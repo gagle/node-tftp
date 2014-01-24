@@ -50,19 +50,29 @@ var put = function (local, remote, cb){
   fs.stat (local, function (error, stats){
     if (error) return cb (error);
     
+    var closed = false;
+    
     var rs = fs.createReadStream (local)
         .on ("error", function (error){
           //Abort the PUT stream
           ps.abort (error);
+        })
+        .on ("close", function (){
+          closed = true;
         });
     
     var ps = new PutStream (remote, me._options, { size: stats.size })
         .on ("error", function (error){
-          //Close the readable stream
-          rs.on ("close", function (){
+          if (closed){
+            //Empty origin file
             cb (error);
-          });
-          rs.destroy ();
+          }else{
+            //Close the readable stream
+            rs.on ("close", function (){
+              cb (error);
+            });
+            rs.destroy ();
+          }
         })
         .on ("abort", function (error){
           //The error comes from the rs

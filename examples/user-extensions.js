@@ -12,10 +12,16 @@ var fs = require ("fs");
 var tftp = require ("../lib");
 
 var server = tftp.createServer (function (req, res){
+  req.on ("error", function (error){
+    console.error (error);
+  });
   req.on ("stats", function (stats){
     res.setUserExtensions ({ num: parseFloat (stats.userExtensions.num) - 1 });
   });
   this.requestListener (req, res);
+});
+server.on ("error", function (error){
+  console.error (error);
 });
 server.listen ();
 

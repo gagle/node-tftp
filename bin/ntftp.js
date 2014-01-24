@@ -572,6 +572,9 @@ function put (local, remote, cb){
         .on ("error", function (error){
           write.error = error;
           write.ps.abort (errors.EIO);
+        })
+        .on ("close", function (){
+          write = null;
         });
     
     write.ps = client.createPutStream (remote, { size: stats.size })
@@ -580,11 +583,16 @@ function put (local, remote, cb){
           
           console.log ();
           
-          write.rs.on ("close", function (){
-            write = null;
+          if (!write){
+            //Empty origin file
             cb (error);
-          });
-          write.rs.destroy ();
+          }else{
+            write.rs.on ("close", function (){
+              write = null;
+              cb (error);
+            });
+            write.rs.destroy ();
+          }
         })
         .on ("abort", function (){
           if (bar) bar.cancel ();

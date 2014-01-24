@@ -1,17 +1,24 @@
+v0.0.12 (xx Jan 2014)
+  Client: Fixed put stream error handling with empty files.
+  Client: Improved maximum size error handling.
+  Improved the error checking with DATA and ACK packets.
+
 v0.0.11 (23 Jan 2014)
-  Fixed IPv6 server socket.
+  Server: Fixed IPv6 socket.
 
 v0.0.10 (22 Jan 2014)
-  Allow error messages with code 0 and no description.
+  Allowed error messages with code 0 and no description.
 
 v0.0.9 (21 Jan 2014)
-  Added DNS address resolution in the client and automatic UDP socket type
-    creation (ipv4 or ipv6).
+  Client: Added DNS address resolution.
+  Added automatic UDP socket type creation (IPv4 or IPv6).
   Renamed "hostname" option to "host".
-  When the request is a PUT operation now "setUserExtensions()" works correctly.
+  Server: When the request is a PUT operation "setUserExtensions()" works
+    correctly.
 
 v0.0.8 (21 Jan 2014)
-  Allow aborting a request without calling the default request listener.
+  Server: Allowed aborting a request without calling the default request
+    listener.
   Minor internal refactor.
 
 v0.0.7 (20 Jan 2014)
