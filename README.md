@@ -583,7 +583,7 @@ __Error codes__
 
 The following errors are used internally but they are exposed in case you need reuse any of them.
 
-The errors emitted can contain a property named `code`. It has the name of the error.
+The errors emitted by any `error` event of this module can contain a property named `code`. It has the name of the error.
 
 _module_.ENOENT - File not found  
 _module_.EACCESS - Access violation  
