@@ -26,7 +26,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `mail` and `netascii` transfer modes ✗
 
-[CLIENT](#client) | [SERVER](#server)
+[CLIENT](#client) | [SERVER](#server) | [Error codes](#error_codes)
 
 Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
@@ -484,6 +484,8 @@ __Properties__
 
 - [root](#server_root)
 
+[__Error codes__](#server_errors)
+
 ---
 
 <a name="server_event_close"></a>
@@ -573,3 +575,33 @@ The PutStream has two additional methods:
   As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
   
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
+
+---
+
+<a name="error_codes"></a>
+__Error codes__
+
+The following errors are used internally but they are exposed in case you need reuse any of them.
+
+The errors emitted can contain a property named `code`. It has the name of the error.
+
+_module_.ENOENT - File not found  
+_module_.EACCESS - Access violation  
+_module_.ENOSPC - Disk full or allocation exceeded  
+_module_.EBADOP - Illegal TFTP operation  
+_module_.ETID - Unknown transfer ID  
+_module_.EEXIST - File already exists  
+_module_.ENOUSER - No such user  
+_module_.EDENY - The request has been denied  
+_module_.ESOCKET - Invalid remote socket  
+_module_.EBADMSG - Malformed TFTP message  
+_module_.EABORT - Aborted  
+_module_.EFBIG - File too big  
+_module_.ETIME - Timed out  
+_module_.EBADMODE - Invalid transfer mode  
+_module_.EBADNAME - Invalid filename  
+_module_.EIO - I/O error  
+_module_.ENOGET - Cannot GET files  
+_module_.ENOPUT - Cannot PUT files  
+_module_.ERBIG - Request bigger than 512 bytes  
+_module_.ECONPUT - Concurrent PUT request over the same file
