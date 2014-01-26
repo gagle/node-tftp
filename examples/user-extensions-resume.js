@@ -15,9 +15,6 @@ var server = tftp.createServer ({ denyPUT: true }, function (req, res){
   req.on ("error", function (error){
     console.error (error);
   });
-  req.on ("close", function (){
-    console.log ("close");
-  });
   req.on ("stats", function (stats){
     var offset = 0;
     if (stats.userExtensions && stats.userExtensions.offset){
