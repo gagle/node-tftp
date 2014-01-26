@@ -13,28 +13,29 @@ var server = tftp.createServer ({
   port: 1234
 }, function (req, tftpRes){
   req.on ("error", function (error){
-    //Errors from the connection
-    //The errors from the response are forwarded to the error listener of the
-    //request
+    //Errors from the request
     console.error (error);
   });
 
   if (req.file === "node.exe"){
     //Prevent uploading a file named "node.exe"
-    if (req.method === "PUT") return req.abort ();
+    if (req.method === "PUT") return req.abort (tftp.ENOPUT);
     
     //Get the data from internet
     var me = this;
     http.get ("http://nodejs.org/dist/latest/node.exe", function (httpRes){
+      //Set the response size, this is mandatory
+      tftpRes.setSize (parseInt (httpRes.headers["content-length"]));
+      
       //As soon as the data chunks are received from a remote location via http,
-      //they are sent back to client via tftp
+      //send them back to client via tftp
       httpRes.pipe (tftpRes);
     }).on ("error", function (error){
       req.on ("abort", function (){
         //Redirect the errors to the request error handler
         req.emit ("error", error);
       });
-      req.abort ();
+      req.abort (tftp.EIO);
     });
   }else{
     //Call the default request listener

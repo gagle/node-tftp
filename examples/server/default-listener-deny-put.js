@@ -18,9 +18,7 @@ server.on ("error", function (error){
 
 server.on ("request", function (req){
   req.on ("error", function (error){
-    //Errors from the connection
-    //The errors from the response are forwarded to the error listener of the
-    //request
+    //Errors from the request
     console.error (error);
   });
 });

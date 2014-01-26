@@ -314,7 +314,7 @@ __Events__
 
 __Methods__
 
-- [abort() : undefined](#client_getstream_putstream_abort)
+- [abort([error]) : undefined](#client_getstream_putstream_abort)
 
 ---
 
@@ -385,9 +385,9 @@ The `userExtensions` property holds an object with the custom extensions sent by
 ---
 
 <a name="client_getstream_putstream_abort"></a>
-__abort() : undefined__
+__abort([error]) : undefined__
 
-Aborts the current transfer.
+Aborts the current transfer. The optional `error` can be a string or an Error instance. The message will be sent to the server.
 
 ---
 
@@ -516,7 +516,7 @@ Emitted when a new request has been received. All the connection objects that ar
 
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
-This event is emitted after some minor validations. If the path is directory or the user tries to access a file outside the root directory (eg.: `../file`), the request fails. Furthermore, in the case of GET operations, the request automatically sends an error to the client if the file doesn't exist, so if you use a custom request listener, you don't need to check whether the file exists because this validation was already done.
+Requests trying to access a path outside the root directory (eg.: `../file`) are automatically denied.
 
 ---
 
@@ -560,7 +560,11 @@ The GetStream has two additional properties:
 - __file__ - _String_  
   The path of the file. The directories are not created recursively if they don't exist.
 
-The PutStream has one additional method:
+The PutStream has two additional methods:
+
+- __setSize(size) : undefined__
+
+  Sets the size of the file to send. This method is only needed with GET requests. If you don't need to use a custom listener for the GET requests, then you don't need to use this method. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
 
 - __setUserExtensions(userExtensions) : undefined__
 

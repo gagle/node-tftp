@@ -18,14 +18,12 @@ var server = tftp.createServer ({
   port: 1234
 }, function (req, res){
   req.on ("error", function (error){
-    //Errors from the connection
-    //The errors from the response are forwarded to the error listener of the
-    //request
+    //Errors from the request
     console.error (error);
   });
 
   //root is "."
-  if (path.dirname (req.file) !== this.root) return req.abort ();
+  if (path.dirname (req.file) !== this.root) return req.abort ("Invalid path");
   
   //Call the default request listener
   this.requestListener (req, res);

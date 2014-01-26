@@ -22,8 +22,14 @@ var connections = [];
 var server = tftp.createServer ();
 
 server.on ("request", function (req){
+  req.on ("error", function (error){
+    //Errors from the request
+    console.error (error);
+  });
+  
   //Save the connection
   connections.push (req);
+  
   //The "close" event is fired when the internal socket closes, regardless
   //whether it is produced by an error or because the socket closes naturally
   //due to the end of the transfer or because the transfer has been aborted
@@ -35,6 +41,11 @@ server.on ("request", function (req){
       console.log ("Server closed");
     }
   });
+});
+
+server.on ("error", function (error){
+  //Errors from the main socket
+  console.error (error);
 });
 
 server.listen ();

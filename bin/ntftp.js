@@ -470,6 +470,8 @@ function get (remote, local, cb){
     var noExtensionsTimer = null;
     
     read = {};
+    var open = false;
+    var destroy = null;
     
     read.gs = client.createGetStream (remote)
         .on ("error", function (error){
@@ -478,13 +480,17 @@ function get (remote, local, cb){
           
           if (started) console.log ();
           
-          read.ws.on ("close", function (){
-            fs.unlink (local, function (){
-              read = null;
-              cb (error);
+          if (open){
+            read.ws.on ("close", function (){
+              fs.unlink (local, function (){
+                read = null;
+                cb (error);
+              });
             });
-          });
-          read.ws.destroy ();
+            read.ws.destroy ();
+          }else{
+            destroy = error;
+          }
         })
         .on ("abort", function (){
           if (bar) bar.cancel ();
@@ -535,6 +541,18 @@ function get (remote, local, cb){
         .on ("error", function (error){
           read.error = error;
           read.gs.abort (errors.EIO);
+        })
+        .on ("open", function (){
+          if (destroy){
+            read.ws.on ("close", function (){
+              fs.unlink (local, function (){
+                cb (destroy);
+              });
+            });
+            read.ws.destroy ();
+          }else{
+            open = true;
+          }
         })
         .on ("finish", function (){
           read = null;

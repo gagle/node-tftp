@@ -1,3 +1,16 @@
+v0.0.13 (26 Jan 2014)
+  Server: Deny concurrent PUT requests over the same file.
+  Server: The "stats" event is now emitted in a future tick. This allows to
+    call the default request listener after the "stats" event and allows to
+    create the stream chaining based on the values of the "stats" object.
+  Server: Added "setSize()". It must be used with custom request listeners to
+    set the size of the response when is a GET request.
+  Better maximum size error handling.
+  Server: Exposed error codes.
+  Server: Now the server doesn't check for initial errors. As soon as a new
+    request starts, it creates the streams and emits the "request" event.
+  Minor improvements.
+
 v0.0.12 (24 Jan 2014)
   Client: Fixed put stream error handling with empty files.
   Client: Improved maximum size error handling.

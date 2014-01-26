@@ -13,17 +13,24 @@ other sources or destinations.
 
 var client = tftp.createClient ();
 
-var get = function (remote, local, cb){	
+var get = function (remote, local, cb){
+  var open = false;
+  var destroy = null;
+
   var gs = client.createGetStream (remote)
       .on ("error", function (error){
-        //Close the writable stream and remove the local file if the GET
-        //operation fails
-        ws.on ("close", function (){
-          fs.unlink (local, function (){
-            cb (error);
+        if (open){
+          //The file is open, destroy the stream and remove the file
+          ws.on ("close", function (){
+            fs.unlink (local, function (){
+              cb (error);
+            });
           });
-        });
-        ws.destroy ();
+          ws.destroy ();
+        }else{
+          //Wait until the file is open
+          destroy = error;
+        }
       })
       .on ("abort", function (error){
         //Remove the local file if the GET stream is aborted
@@ -37,6 +44,19 @@ var get = function (remote, local, cb){
       .on ("error", function (error){
         //Abort the GET stream
         gs.abort (error);
+      })
+      .on ("open", function (){
+        if (destroy){
+          //There was an error in the get stream and the file must be removed
+          ws.on ("close", function (){
+            fs.unlink (local, function (){
+              cb (error);
+            });
+          });
+          ws.destroy ();
+        }else{
+          open = true;
+        }
       })
       .on ("finish", function (){
         //Transfer finished
