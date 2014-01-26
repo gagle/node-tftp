@@ -53,6 +53,7 @@ fs.writeFileSync ("tmp2", "01234");
 
 var client = tftp.createClient ();
 
+//Get the content "56789" from tmp1 and append it to tmp2 which contains "01234"
 var gs = client.createGetStream ("tmp1", { userExtensions: { offset: 5 } })
     .on ("error", function (error){
       console.error (error);
