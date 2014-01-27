@@ -3,15 +3,16 @@
 var tftp = require ("../../lib");
 
 /*
-This examples demonstrates how to close the server and all the current
+This example demonstrates how to close the server and all the current
 connections gracefully.
 
 This is slightly different from the http server where the "connection" event
 returns the socket and you must call to socket.destroy() to close it. On the
 other hand, this tftp server doesn't have a "connection" event because the
-internal socket is not exposed to the public access. The "req" argument acts
-like a "connection" object. When req.abort() is called it sends an error message
-to the client and then the socket is closed, that is, it's a real graceful
+internal socket is not exposed to the public, it just has a "request" event
+which is fired each time the server receives a new request. The "req" argument
+acts like a "connection" object. When req.abort() is called it sends an error
+message to the client and then the socket closes, that is, it's a real graceful
 shutdown. Instead of killing the socket by brute force, the server informs the
 client that the transfer has been aborted, so the client is able to abort the
 transfer immediately instead of begin a timeout and then abort.
@@ -68,4 +69,4 @@ setTimeout (function (){
     }
   });
   server.close ();
-}, 10000);
+}, 2000);

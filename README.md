@@ -315,6 +315,7 @@ __Events__
 __Methods__
 
 - [abort([error]) : undefined](#client_getstream_putstream_abort)
+- [close() : undefined](#client_getstream_putstream_close)
 
 ---
 
@@ -344,7 +345,7 @@ __error__
 
 Arguments: `error`.
 
-Emitted when an error occurs. The stream is closed automatically.
+Emitted when an error occurs or when [abort()](#client_getstream_putstream_abort) or  [close()](#client_getstream_putstream_close). The stream is closed automatically.
 
 <a name="client_event_finish"></a>
 __finish__
@@ -387,7 +388,14 @@ The `userExtensions` property holds an object with the custom extensions sent by
 <a name="client_getstream_putstream_abort"></a>
 __abort([error]) : undefined__
 
-Aborts the current transfer. The optional `error` can be a string or an Error instance. The message will be sent to the server.
+Aborts the current transfer. The optional `error` can be an Error instance or any type (it is stringified). If no error message is given, it sends an [EABORT](#error_codes) error. The message is sent to the server but it is not guaranteed that it will reach it because TFTP is built on top of UDP and the error messages are not retransmitted, so the packet could be lost. If the message reaches the server, then the transfer is aborted immediately.
+
+---
+
+<a name="client_getstream_putstream_close"></a>
+__close() : undefined__
+
+Closes the current transfer. It's the same as the [abort()](#client_getstream_putstream_abort) function but it doesn't send to the server any message, it just closes the socket. Note that this will cause the server to start the timeout. The recommended way to interrupt a transfer is using [abort()](#client_getstream_putstream_abort).
 
 ---
 
@@ -519,6 +527,8 @@ Emitted when a new request has been received. All the connection objects that ar
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
 Requests trying to access a path outside the root directory (eg.: `../file`) are automatically denied.
+
+Note: If you don't want 
 
 ---
 

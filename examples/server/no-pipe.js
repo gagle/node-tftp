@@ -1,12 +1,11 @@
 "use strict";
 
-var http = require ("http");
+var fs = require ("fs");
 var tftp = require ("../../lib");
 
 /*
-This example demonstrates the usefulness of the streams. When the client
-requests a file named "node.exe", it obtains the data from a remote location, in
-this case via http.
+You don't need to pipe from the a file, the response it's just a writable
+stream.
 */
 
 var server = tftp.createServer ({
@@ -18,12 +17,12 @@ var server = tftp.createServer ({
     console.error (error);
   });
 
-  if (req.file === "no-pipe"){
-    res.setSize (5);
-    res.end (new Buffer ("12345"));
+  if (req.file === "hello"){
+    var message = "Hello World!";
+    res.setSize (message.length);
+    res.end (message);
   }else{
-    //Call the default request listener
-    this.requestListener (req, res);
+    req.abort ("Can only GET the file 'hello'");
   }
 });
 
@@ -33,3 +32,14 @@ server.on ("error", function (error){
 });
 
 server.listen ();
+
+tftp.createClient ({ port: 1234 }).createGetStream ("hello")
+    .on ("error", function (error){
+      server.close ();
+      console.error (error);
+    })
+    .on ("end", function (){
+      server.close ();
+    })
+    //Hello World!
+    .pipe (process.stdout);
