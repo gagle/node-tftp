@@ -528,7 +528,7 @@ Emitted when a new request has been received. All the connection objects that ar
 
 Requests trying to access a path outside the root directory (eg.: `../file`) are automatically denied.
 
-Note: If you don't want 
+Note: If you don't need do anything with the `req` or `res` arguments, that is, you don't need to write or read data, then you __must__ [abort()](#client_getstream_putstream_abort) or [close()](#client_getstream_putstream_close) the connection, otherwise you'll have an open connection for the rest of the server's lifetime. The client will timeout because it won't receive any packet, that's for sure, but the connection in the server will remain open and won't timeout. The timeout retransmissions at the server-side begins when the transfer starts but if you don't read/write/close, the connection won't timeout because it is simply waiting to the user to do something with it.
 
 ---
 
