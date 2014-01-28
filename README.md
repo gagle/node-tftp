@@ -431,7 +431,7 @@ server.on ("error", function (error){
 
 server.on ("request", function (req, res){
   req.on ("error", function (error){
-    //Errors from the request
+    //Error from the request
     //If this happens, the connection is already closed
     console.error (error);
   });

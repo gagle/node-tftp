@@ -18,7 +18,7 @@ var server = tftp.createServer ({
   port: 1234
 }, function (req, res){
   req.on ("error", function (error){
-    //Errors from the request
+    //Error from the request
     console.error (error);
   });
 

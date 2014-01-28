@@ -24,7 +24,7 @@ var server = tftp.createServer ();
 
 server.on ("request", function (req){
   req.on ("error", function (error){
-    //Errors from the request
+    //Error from the request
     console.error (error);
   });
   

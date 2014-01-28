@@ -18,7 +18,7 @@ server.on ("error", function (error){
 
 server.on ("request", function (req){
   req.on ("error", function (error){
-    //Errors from the request
+    //Error from the request
     console.error (error);
   });
 });

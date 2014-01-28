@@ -13,7 +13,7 @@ var server = tftp.createServer ({
   denyPUT: true
 }, function (req, res){
   req.on ("error", function (error){
-    //Errors from the request
+    //Error from the request
     console.error (error);
   });
 
