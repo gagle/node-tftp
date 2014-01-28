@@ -418,7 +418,7 @@ Closes the current transfer. It's the same as the [abort()](#client_getstream_pu
 <a name="error_handling"></a>
 __Error handling__
 
-It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and server just craches, this is a the way Node.js works.
+It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and the server just craches, this is the way Node.js works.
 
 ```javascript
 var server.createServer (...);
