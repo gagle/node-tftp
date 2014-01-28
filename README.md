@@ -405,12 +405,38 @@ Closes the current transfer. It's the same as the [abort()](#client_getstream_pu
 
 #### Documentation ####
 
+- [Error handling](#error_handling)
 - [Global installation](#server_global)
 
 #### Objects ####
 
 - [Server](#server_object)
 - [GetStream and PutStream](#server_getstream_putstream)
+
+---
+
+<a name="error_handling"></a>
+__Error handling__
+
+It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and server just craches, this is a the way Node.js works.
+
+```javascript
+var server.createServer (...);
+
+server.on ("error", function (error){
+  //Errors from the main socket
+  //If this happens, it's most likely that server has closed
+  console.error (error);
+});
+
+server.on ("request", function (req, res){
+  req.on ("error", function (error){
+    //Errors from the request
+    //If this happens, the connection is already closed
+    console.error (error);
+  });
+});
+```
 
 ---
 
