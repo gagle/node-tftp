@@ -2,6 +2,7 @@ v0.0.15 (28 Jan 2014)
   Server: The default request listener now sends ENOENT errors to the client
     when a GET request fails due to an error in the fs.ReadStream (basically
     file not found).
+  Client: Fixed "put()".
 
 v0.0.14 (27 Jan 2014)
   Server: Added minor validations.

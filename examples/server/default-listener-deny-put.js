@@ -24,3 +24,8 @@ server.on ("request", function (req){
 });
 
 server.listen ();
+
+tftp.createClient ({ port: 1234 }).put (__filename, function (error){
+  console.error (error); //[Error: (Server) Cannot PUT files]
+  server.close ();
+});
