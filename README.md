@@ -602,7 +602,7 @@ The PutStream has two additional methods:
 
 - __setSize(size) : undefined__
 
-  Sets the size of the file to send. This method is only needed with GET requests. If you don't need to use a custom listener for the GET requests, then you don't need to use this method. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
+  Sets the size of the file to send. You need to call this method only with GET requests when you're using a custom request listener for the GET transfers. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
 
 - __setUserExtensions(userExtensions) : undefined__
 
