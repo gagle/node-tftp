@@ -1,3 +1,9 @@
+v0.0.16 (xx Feb 2014)
+  Major internal refactor. The code is more simpler and easy to maintain. The
+    only noticable change in the public APi is that the "stats" event is no
+    longer emitted and it's now available as a property in the "req" object.
+    "req.stats" holds the "stats" object.
+
 v0.0.15 (28 Jan 2014)
   Server: The default request listener now sends ENOENT errors to the client
     when a GET request fails due to an error in the fs.ReadStream (basically
