@@ -18,6 +18,8 @@ var server = tftp.createServer ({
   });
 
   if (req.file === "hello"){
+    res.setUserExtensions ({ platform: process.platform, pid: process.pid });
+    
     var message = "Hello World!";
     res.setSize (message.length);
     res.end (message);
@@ -33,10 +35,21 @@ server.on ("error", function (error){
 
 server.listen ();
 
-tftp.createClient ({ port: 1234 }).createGetStream ("hello")
+var options = {
+  userExtensions: {
+    platform: "",
+    pid: ""
+  }
+};
+
+tftp.createClient ({ port: 1234 }).createGetStream ("hello", options)
     .on ("error", function (error){
       server.close ();
       console.error (error);
+    })
+    .on ("stats", function (stats){
+      console.log ("TFTP server running on " + stats.userExtensions.platform +
+          " with pid " + stats.userExtensions.pid + ".");
     })
     .on ("end", function (){
       server.close ();

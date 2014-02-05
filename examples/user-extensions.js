@@ -15,8 +15,8 @@ var server = tftp.createServer (function (req, res){
   req.on ("error", function (error){
     console.error (error);
   });
-  req.on ("stats", function (stats){
-    res.setUserExtensions ({ num: parseFloat (stats.userExtensions.num) - 1 });
+  res.setUserExtensions ({
+    num: parseFloat (req.stats.userExtensions.num) - 1
   });
   this.requestListener (req, res);
 });
@@ -25,7 +25,7 @@ server.on ("error", function (error){
 });
 server.listen ();
 
-fs.openSync ("tmp1", "w");
+fs.writeFileSync ("tmp1", "");
 console.log (">> 3");
 
 tftp.createClient ()

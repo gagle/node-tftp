@@ -1,5 +1,6 @@
 "use strict";
 
+var fs = require ("fs");
 var http = require ("http");
 var tftp = require ("../../lib");
 
@@ -49,3 +50,9 @@ server.on ("error", function (error){
 });
 
 server.listen ();
+
+tftp.createClient ({ port: 1234 }).get ("node.exe", function (error){
+  server.close ();
+  try{ fs.unlinkSync ("node.exe"); }catch (error){}
+  if (error) console.error (error);
+});

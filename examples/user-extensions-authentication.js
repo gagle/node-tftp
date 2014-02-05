@@ -14,26 +14,28 @@ var users = {
 };
 
 var server = tftp.createServer (function (req, res){
-  var me = this;
   req.on ("error", function (error){
     console.error (error);
   });
-  req.on ("stats", function (stats){
-    if (!stats.userExtensions || !stats.userExtensions.user ||
-        !stats.userExtensions.pass ||
-        users[stats.userExtensions.user] !== stats.userExtensions.pass){
-      req.abort ("Invalid user");
-    }else{
-      me.requestListener (req, res);
-    }
-  });
+  if (!req.stats.userExtensions.user || !req.stats.userExtensions.pass ||
+      users[req.stats.userExtensions.user] !== req.stats.userExtensions.pass){
+    req.abort ("Invalid user");
+  }else{
+    this.requestListener (req, res);
+  }
 });
 server.on ("error", function (error){
   console.error (error);
 });
 server.listen ();
 
-fs.openSync ("tmp1", "w");
+var clean = function (){
+  server.close ();
+  try{ fs.unlinkSync ("tmp1"); }catch (error){}
+  try{ fs.unlinkSync ("tmp2"); }catch (error){}
+};
+
+fs.writeFileSync ("tmp1", "");
 
 var client = tftp.createClient ();
 client.get ("tmp1", "tmp2", function (error){
@@ -44,11 +46,8 @@ client.get ("tmp1", "tmp2", function (error){
     user: "usr1",
     pass: "usr1-pass"
   }}, function (error){
+    clean ();
     if (error) return console.error (error);
-    
     console.log ("OK");
-    server.close ();
-    fs.unlinkSync ("tmp1");
-    fs.unlinkSync ("tmp2");
   });
 });

@@ -1,13 +1,13 @@
-v0.0.16 (xx Feb 2014)
-  Major internal refactor. The code is more simpler and easy to maintain. The
-    only noticable change in the public APi is that the "stats" event is no
-    longer emitted and it's now available as a property in the "req" object.
-    "req.stats" holds the "stats" object.
+v0.0.16 (06 Feb 2014)
+  Major internal refactor. The only noticable change in the public API is the
+    removal of the "stats" event in favor of a "stats" object attached to the
+    "req" parameter. This is a way more simpler to use the API because now
+    you have immediate access to the socket (ie. logging purposes).
+  Removed the "file" property from the "stats" object.
+  The "userExtensions" now defaults to an empty object instead of null.
+  Server: Minor bugfixes and improvements.
 
 v0.0.15 (28 Jan 2014)
-  Server: The default request listener now sends ENOENT errors to the client
-    when a GET request fails due to an error in the fs.ReadStream (basically
-    file not found).
   Client: Fixed "put()".
 
 v0.0.14 (27 Jan 2014)

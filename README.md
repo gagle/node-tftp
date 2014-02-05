@@ -418,7 +418,7 @@ Closes the current transfer. It's the same as the [abort()](#client_getstream_pu
 <a name="error_handling"></a>
 __Error handling__
 
-It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and the server just craches, this is the way Node.js works.
+It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and the server just crashes, this is the way Node.js works.
 
 ```javascript
 var server.createServer (...);
@@ -433,7 +433,8 @@ server.on ("request", function (req, res){
   req.on ("error", function (error){
     //Error from the request
     //If this happens, the connection is already closed
-    console.error (error);
+    console.error ("[" + req.stats.remoteAddress + ":" + req.stats.remotePort +
+        "] (" + req.file + ") " + error.message);
   });
 });
 ```
@@ -593,22 +594,25 @@ When the `request` event is emitted, a new GetStream and PutStream instances are
 
 The GetStream has two additional properties:
 
-- __method__ - _String_  
-  The transfer's method: `GET` or `PUT`.
 - __file__ - _String_  
   The path of the file. The directories are not created recursively if they don't exist.
+- __method__ - _String_  
+  The transfer's method: `GET` or `PUT`.
+- __stats__ - _Object_  
+  An object holding some stats from the current request. [More information](#client_event_stats).
 
 The PutStream has two additional methods:
 
+<a name="server_getstream_putstream_setsize"></a>
 - __setSize(size) : undefined__
 
-  Sets the size of the file to send. You need to call this method only with GET requests when you're using a custom request listener for the GET transfers. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
+  Sets the size of the file to send. You need to call this method only with GET requests when you're using a custom request listener for the GET transfers, otherwise the request will just wait. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
 
 - __setUserExtensions(userExtensions) : undefined__
 
-  Sets the user extensions to send back to the client in response to the received ones. You cannot send extensions different from the ones that are sent by the client.
+  Sets the user extensions to send back to the client in response to the received ones. You cannot send extensions different from the ones that are sent by the client. This method must be called before [setSize()](#server_getstream_putstream_setsize).
   
-  As said previously, the TFTP protocol doesn't have any built-in authentication but thanks to the user extensions you can implement a simple authentication mechanism as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
+  As said previously, the TFTP protocol doesn't have any built-in authentication mechanism but thanks to the user extensions you can implement a simple authentication as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
   
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
 
