@@ -1,4 +1,4 @@
-v0.0.16 (06 Feb 2014)
+v0.0.16 (05 Feb 2014)
   Server: Major internal refactor. The only noticable change in the public API
     is the removal of the "stats" event in favor of a "stats" object attached to
     the "req" parameter. This is a way more simpler to use the API because now
