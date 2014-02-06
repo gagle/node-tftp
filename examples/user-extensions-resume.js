@@ -10,7 +10,6 @@ var fs = require ("fs");
 var tftp = require ("../lib");
 
 var server = tftp.createServer ({ denyPUT: true }, function (req, res){
-  var me = this;
   req.on ("error", function (error){
     console.error (error);
   });
@@ -23,7 +22,7 @@ var server = tftp.createServer ({ denyPUT: true }, function (req, res){
     }
   }
   
-  var file = me.root + "/" + req.file;
+  var file = this.root + "/" + req.file;
   fs.stat (file, function (error, stats){
     if (error) return req.abort (tftp.EIO);
     

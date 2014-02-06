@@ -15,14 +15,18 @@ var server = tftp.createServer (function (req, res){
   req.on ("error", function (error){
     console.error (error);
   });
+  
   res.setUserExtensions ({
     num: parseFloat (req.stats.userExtensions.num) - 1
   });
+  
   this.requestListener (req, res);
 });
+
 server.on ("error", function (error){
   console.error (error);
 });
+
 server.listen ();
 
 fs.writeFileSync ("tmp1", "");

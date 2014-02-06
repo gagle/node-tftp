@@ -17,6 +17,7 @@ var server = tftp.createServer (function (req, res){
   req.on ("error", function (error){
     console.error (error);
   });
+  
   if (!req.stats.userExtensions.user || !req.stats.userExtensions.pass ||
       users[req.stats.userExtensions.user] !== req.stats.userExtensions.pass){
     req.abort ("Invalid user");
@@ -24,9 +25,11 @@ var server = tftp.createServer (function (req, res){
     this.requestListener (req, res);
   }
 });
+
 server.on ("error", function (error){
   console.error (error);
 });
+
 server.listen ();
 
 var clean = function (){
