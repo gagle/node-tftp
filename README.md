@@ -504,7 +504,6 @@ __Server__
 __Events__
 
 - [close](#server_event_close)
-- [connection](#server_event_connection)
 - [error](#server_event_error)
 - [listening](#server_event_listening)
 - [request](#server_event_request)
