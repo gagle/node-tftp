@@ -32,7 +32,7 @@ server.on ("request", function (req){
   connections.push (req);
   
   //The "close" event is fired when the internal socket closes, regardless
-  //whether it is produced by an error or because the socket closes naturally
+  //whether it is produced by an error, because the socket closes naturally
   //due to the end of the transfer or because the transfer has been aborted
   req.on ("close", function (){
     //Remove the connection
@@ -69,4 +69,4 @@ setTimeout (function (){
     }
   });
   server.close ();
-}, 2000);
+}, 10000);

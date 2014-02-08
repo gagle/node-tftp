@@ -16,6 +16,7 @@ var client = tftp.createClient ();
 var get = function (remote, local, cb){
   var open = false;
   var destroy = null;
+  var err = null;
 
   var gs = client.createGetStream (remote)
       .on ("error", function (error){
@@ -32,18 +33,19 @@ var get = function (remote, local, cb){
           destroy = error;
         }
       })
-      .on ("abort", function (error){
+      .on ("abort", function (){
         //Remove the local file if the GET stream is aborted
         fs.unlink (local, function (){
           //The error comes from the ws
-          cb (error);
+          cb (err);
         });
       });
       
   var ws = fs.createWriteStream (local)
       .on ("error", function (error){
         //Abort the GET stream
-        gs.abort (error);
+        err = error;
+        gs.abort (tftp.EIO);
       })
       .on ("open", function (){
         if (destroy){
@@ -75,7 +77,8 @@ var put = function (local, remote, cb){
     var rs = fs.createReadStream (local)
         .on ("error", function (error){
           //Abort the PUT stream
-          ps.abort (error);
+          err = error;
+          ps.abort (tftp.EIO);
         })
         .on ("close", function (){
           closed = true;
@@ -94,9 +97,9 @@ var put = function (local, remote, cb){
             rs.destroy ();
           }
         })
-        .on ("abort", function (error){
+        .on ("abort", function (){
           //The error comes from the rs
-          cb (error);
+          cb (err);
         })
         .on ("finish", function (){
           //Transfer finished

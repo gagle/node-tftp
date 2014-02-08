@@ -1,3 +1,11 @@
+v0.0.17 (08 Feb 2014)
+  The "abort" event doesn't emit any error.
+  Client: Removed "highWaterMark" option from all the functions. This option is
+    in fact the "blockSize" option. The "highWaterMark" is only applicable in
+    the other stream that pushes data to the PutStream, and is not very useful.
+  Client: Convert the md5 and sha1 sums to lower case before comparing.
+  Client: Renamed "md5sum" and "sha1sum" options to "md5" and "sha1".
+
 v0.0.16 (05 Feb 2014)
   Server: Major internal refactor. The only noticable change in the public API
     is the removal of the "stats" event in favor of a "stats" object attached to

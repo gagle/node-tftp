@@ -28,17 +28,23 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 
 [CLIENT](#client) | [SERVER](#server) | [Error codes](#error_codes)
 
-Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the extensions support, the RFC says that a file bigger than 32MB cannot be sent. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
+Per se, the TFTP is a lock-step protocol built on top of UDP for transferring files between two machines. It was useful in the past but nowadays it's practically an obsolete legacy protocol useful in a very few scenarios. Without the extensions support, the RFC says that a file bigger than 32MB cannot be transferred. This limit can be incremented to 91.74MB if both machines agree to use a block size of 1468 bytes, the MTU size before IP fragmentation in Ethernet networks. Also, the transfer speed is pretty slow due to the lock-step mechanism, one acknowledgement for each packet.
 
 However, there are two de facto extensions that can boost the transfer speed and remove the size limit: the rollover and the window.
 
-This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation. The server also supports both the enhanced features and the classic lock-step implementations.
+This module it's perfectly integrated with Node.js, providing an streaming interface for GETting and PUTing files very easily. No configuration is needed. By default the client tries to negotiate with the server the best possible configuration. If that's not possible it simply fallbacks to the original lock-step TFTP implementation. The server also supports both the enhanced features and the classic lock-step RFCs.
 
-It can be installed locally and used programmatically, but it can be also installed globally and used directly from the console as a CLI utility (client only).
+It can be installed locally and used programmatically, but it can be also installed globally and used directly from the console as a CLI utility.
 
 #### Special thanks ####
 
 Patrick Masotta (author of the [Serva](http://www.vercot.com/~serva/) application and the internet draft about the `windowsize` option).
+
+#### Local environment vs Internet ####
+
+TFTP runs over UDP, this means that the network packets could be lost before reaching the other side. In local controlled scenarios, the TFTP can be used in a very few cases, but don't pretend to use it over the Internet, use FTP instead. It simply doesn't work because the packets are lost with an amazing ease.
+
+TFTP is a bad protocol for transferring files because it adds some of features that TCP offers (ack's, retransmission, error detection, reordering, etc.) to the UDP but at the applicaction layer (slower!). Think why you need to use TFTP instead of FTP. In most of the cases you can use FTP and obtain better results.
 
 <a name="udploss"></a>
 #### Warning! UDP packet loss in Windows ####
@@ -179,7 +185,7 @@ Options:
     <tr><td>6</td><td>-76%</td></tr>
   </table>
   
-  Take into account that with a bigger window more elements must be sorted (remember that UDP doesn't sort the incoming packets). This doesn't slow down the transfer very much but it requires more CPU. A window size of 4 is a good trade between transfer speed and CPU usage.
+  Take into account that with a bigger window more elements must be reordered (remember that UDP doesn't reorder the incoming packets). This doesn't slow down the transfer speed very much but it requires more CPU. A window size of 4 is a good trade between transfer speed and CPU usage.
   
   Right now a window size of 6 is the maximum in Windows due to the [packet loss](#udploss) issue. With a window size of 7 or greater a lot of timeouts and retransmissions begin to occur, so the recommendation is to use a window size of 4, the default value.
 - __retries__ - _Number_  
@@ -200,10 +206,15 @@ var options = {
     foo: "bar",
     num: 2
   }
-}
+};
+
+client.get ("file", options, function (){ ... });
+client.put ("file", options, function (){ ... });
+client.createGetStream ("file", options);
+client.createPutStream ("file", options);
 ```
   
-The server may ignore or not these extensions, this feature is server-dependent. Please note that the TFTP algorithm cannot be modified. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
+The server may ignore or not these extensions. This feature is server-dependent. Please note that the TFTP algorithm cannot be modified. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
   
 The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
 
@@ -221,11 +232,9 @@ Returns a new [GetStream](#client_getstream_putstream) instance.
 
 Options:
 
-- __highWaterMark__ - _Number_  
-  Buffer size. Default is 16KB.
-- __md5sum__ - _String_  
+- __md5__ - _String_  
   MD5 sum for validating the integrity of the file.
-- __sha1sum__ - _String_  
+- __sha1__ - _String_  
   SHA1 sum for validating the integrity of the file.
 - __userExtensions__ - _Object_  
   Custom extensions to send with the request. [More information](#client).
@@ -241,8 +250,6 @@ Returns a new [PutStream](#client_getstream_putstream) instance.
 
 Options:
 
-- __highWaterMark__ - _Number_  
-  Buffer size. Default is 16KB.
 - __size__ - _String_  
   Total size of the file to upload. This option is required.
 - __userExtensions__ - _Object_  
@@ -255,22 +262,20 @@ var put = client.createPutStream ("file", { size: 1234 });
 <a name="client_get"></a>
 __Client#get(remoteFile[, localFile][, options], callback) : undefined__
 
-Downloads a file from the server. If the local filename is missing the filename of the remote file is used.
+Downloads a file from the server. If the local filename is missing, the basename of the remote file is used.
 
 Options:
 
-- __highWaterMark__ - _Number_  
-  Buffer size. Default is 16KB.
-- __md5sum__ - _String_  
+- __md5__ - _String_  
   MD5 sum for validating the integrity of the file.
-- __sha1sum__ - _String_  
+- __sha1__ - _String_  
   SHA1 sum for validating the integrity of the file.
 - __userExtensions__ - _Object_  
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
-//tftp://<host>/file -> file
-client.get ("file", function (error){
+//tftp://<host>/dir/to/remote-file -> ./file
+client.get ("dir/to/remote-file", function (error){
   if (error) return console.error (error);
   ...
 });
@@ -279,18 +284,16 @@ client.get ("file", function (error){
 <a name="client_put"></a>
 __Client#put(localFile[, remoteFile][, options], callback) : undefined__
 
-Uploads a file to the server. If the remote filename is missing the filename of the local file is used.
+Uploads a file to the server. If the remote filename is missing the basename of the local file is used.
 
 Options:
 
-- __highWaterMark__ - _Number_  
-  Buffer size. Default is 16KB.
 - __userExtensions__ - _Object_  
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
-//file -> tftp://<host>/file
-client.put ("file", function (error){
+//./dir/to/local-file -> tftp://<host>/file
+client.put ("dir/to/local-file", function (error){
   if (error) return console.error (error);
   ...
 });
@@ -324,14 +327,14 @@ __abort__
 
 Arguments: none.
 
-Emitted when [abort()](#client_getstream_putstream_abort) is called and the transfer has been aborted.
+Emitted when the transfer has been aborted after calling to [abort()](#client_getstream_putstream_abort).
 
 <a name="client_event_close"></a>
 __close__
 
 Arguments: none.
 
-Emitted when the underlying socket has been closed. It is emitted __always__ and before any other event (`error`, `abort`, `end` or `finish`).
+Emitted when the underlying socket has been closed. It is emitted __always__ and before any other event (`error`, `abort`, `end` and `finish`).
 
 <a name="client_event_end"></a>
 __end__
@@ -345,7 +348,7 @@ __error__
 
 Arguments: `error`.
 
-Emitted when an error occurs or when [abort()](#client_getstream_putstream_abort) or  [close()](#client_getstream_putstream_close). The stream is closed automatically.
+Emitted when an error occurs. The stream is closed automatically.
 
 <a name="client_event_finish"></a>
 __finish__
@@ -359,7 +362,7 @@ __stats__
 
 Arguments: `stats`.
 
-Emitted when the client negotiates the best possible configuration. When it is emitted the transfer still hasn't begun.
+Emitted after the client has negotiated the best possible configuration. When it is emitted, the file transfer still hasn't begun.
 
 `stats` is an object similar to this:
 
@@ -368,8 +371,7 @@ Emitted when the client negotiates the best possible configuration. When it is e
   blockSize: 1468,
   windowSize: 4,
   size: 105757295,
-  userExtensions: null,
-  file: 'file',
+  userExtensions: {},
   retries: 3,
   timeout: 3000,
   localAddress: "0.0.0.0",
@@ -379,23 +381,23 @@ Emitted when the client negotiates the best possible configuration. When it is e
 }
 ```
 
-When the GetStream emits a `stats` event, the `size` property is not guaranteed to be a Number because the server may not implement all the RFCs. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
+When the GetStream emits a `stats` event, the `size` property is not guaranteed to be a Number because the server may not implement the RFC related with file size. The size of the file is obtained during the negotiation but not all the servers are able to negotiate. In these cases the `size` is null.
 
-The `userExtensions` property holds an object with the custom extensions sent by the server in response to the custom extensions sent with the request. Most of the TFTP servers don't let you respond with custom extensions when in fact this is a feature explained in the RFCs, so unless the TFTP server allows you to respond with custom extensions, this property will be always null. Of course, the server included with this module let you set the user extensions to send back to the client.
+The `userExtensions` property holds an object with the custom extensions sent by the server in response to the custom extensions sent with the request. Most of the TFTP servers don't let you respond with custom extensions when in fact this is a feature commented in the RFCs, so unless the TFTP server allows you to respond with custom extensions, this property will be always an empty object. Of course, the server provided by this module supports the user extensions.
 
 ---
 
 <a name="client_getstream_putstream_abort"></a>
 __abort([error]) : undefined__
 
-Aborts the current transfer. The optional `error` can be an Error instance or any type (it is stringified). If no error message is given, it sends an [EABORT](#error_codes) error. The message is sent to the server but it is not guaranteed that it will reach it because TFTP is built on top of UDP and the error messages are not retransmitted, so the packet could be lost. If the message reaches the server, then the transfer is aborted immediately.
+Aborts the current transfer. The optional `error` can be an Error instance or any type (it is stringified). If no error message is given, it sends an [EABORT](#error_codes) error. The message is sent to the server but it is not guaranteed that it will reach the other side because TFTP is built on top of UDP and the error messages are not retransmitted, so the packet could be lost. If the message reaches the server, then the transfer is aborted immediately.
 
 ---
 
 <a name="client_getstream_putstream_close"></a>
 __close() : undefined__
 
-Closes the current transfer. It's the same as the [abort()](#client_getstream_putstream_abort) function but it doesn't send to the server any message, it just closes the socket. Note that this will cause the server to start the timeout. The recommended way to interrupt a transfer is using [abort()](#client_getstream_putstream_abort).
+Closes the current transfer. It's the same as the [abort()](#client_getstream_putstream_abort) function but it doesn't send to the server any message, it just closes the local socket. Note that this will cause the server to start the timeout. The recommended way to interrupt a transfer is using [abort()](#client_getstream_putstream_abort).
 
 ---
 
@@ -406,6 +408,7 @@ Closes the current transfer. It's the same as the [abort()](#client_getstream_pu
 #### Documentation ####
 
 - [Error handling](#error_handling)
+- [Graceful shutdown](#graceful_shutdown)
 - [Global installation](#server_global)
 
 #### Objects ####
@@ -418,26 +421,31 @@ Closes the current transfer. It's the same as the [abort()](#client_getstream_pu
 <a name="error_handling"></a>
 __Error handling__
 
-It's very simple. You need to attach two `error` listeners; one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and the server just crashes, this is the way Node.js works.
+It's very simple. You need to attach two `error` listeners: one for the server and one for the request. If you don't attach an `error` listener, Node.js throws the error and the server just crashes.
 
 ```javascript
-var server.createServer (...);
+var server = tftp.createServer (...);
 
 server.on ("error", function (error){
   //Errors from the main socket
-  //If this happens, it's most likely that server has closed
+  //The current transfers are not aborted
   console.error (error);
 });
 
 server.on ("request", function (req, res){
   req.on ("error", function (error){
     //Error from the request
-    //If this happens, the connection is already closed
+    //The connection is already closed
     console.error ("[" + req.stats.remoteAddress + ":" + req.stats.remotePort +
         "] (" + req.file + ") " + error.message);
   });
 });
 ```
+
+<a name="graceful_shutdown"></a>
+__Graceful shutdown__
+
+When the server closes the current transfers are not aborted to allow them to finish. If you need to shutdown the server completely, you must abort all the current transfers manually. Look at [this](https://github.com/gagle/node-tftp/blob/master/examples/server/graceful-shutdown.js) example to know how to do it.
 
 ---
 
@@ -481,7 +489,7 @@ var server = tftp.createServer ({
 });
 ```
 
-The `requestListener` is a function which is automatically added to the [request](#server_event_request) event.
+The `requestListener` is a function which is automatically attached to the [request](#server_event_request) event.
 
 Options:
 
@@ -494,7 +502,7 @@ It has the same options as the [createClient()](#createclient) function with the
 - __denyPUT__ - _Boolean_  
   Denies all the PUT operations. Default is false.
 
-Setting the options `denyGET` or `denyPUT` are more efficient than aborting the request from inside the request listener.
+Setting the options `denyGET` or `denyPUT` is more efficient than aborting the request from inside the request listener.
 
 ---
 
@@ -527,34 +535,34 @@ __close__
 
 Arguments: none.
 
-Emitted when the server closes. No new requests are accepted. Note that the current transfers are not aborted. If you need to close the server gracefully, look at [this](https://github.com/gagle/node-tftp/blob/master/examples/server/graceful-shutdown.js) example.
+Emitted when the server closes. New requests are not accepted. Note that the current transfers are not aborted. If you need to abort them gracefully, look at [this](https://github.com/gagle/node-tftp/blob/master/examples/server/graceful-shutdown.js) example.
 
 <a name="server_event_error"></a>
 __error__
 
 Arguments: `error`.
 
-Emitted when an error occurs receiving data. The server is not closed.
+Emitted when an error occurs. The error is caused by a bad packet reception, so almost always, if the server emits an error, it is still alive accepting new requests. 
 
 <a name="server_event_listening"></a>
 __listening__
 
 Arguments: none.
 
-Emitted when the server has been bound after calling [listen()](#server_listen).
+Emitted when the server has been bound to the socket after calling to [listen()](#server_listen).
 
 <a name="server_event_request"></a>
 __request__
 
 Arguments: `req`, `res`.
 
-Emitted when a new request has been received. All the connection objects that are emitted can be aborted at any time.
+Emitted when a new request has been received. All the connection objects that are emitted by this event can be aborted at any time.
 
 `req` is an instance of a [GetStream](#server_getstream_putstream) and `res` is an instance of a [PutStream](#server_getstream_putstream).
 
 Requests trying to access a path outside the root directory (eg.: `../file`) are automatically denied.
 
-Note: If you don't need do anything with the `req` or `res` arguments, that is, you don't need to write or read data, then you __must__ [abort()](#client_getstream_putstream_abort) or [close()](#client_getstream_putstream_close) the connection, otherwise you'll have an open connection for the rest of the server's lifetime. The client will timeout because it won't receive any packet, that's for sure, but the connection in the server will remain open and won't timeout. The timeout retransmissions at the server-side begins when the transfer starts but if you don't read/write/close, the connection won't timeout because it is simply waiting to the user to do something with it.
+Note: If you don't need do anything with the `req` or `res` arguments, that is, if by any reason you don't want to _consume_ the current request, then you __must__ [abort()](#client_getstream_putstream_abort) or [close()](#client_getstream_putstream_close) the connection, otherwise you'll have an open socket for the rest of the server's lifetime. The client will timeout because it won't receive any packet, that's for sure, but the connection in the server will remain open and won't timeout. The timeout retransmissions at the server-side begin when the transfer starts but if you don't read/write/close, the connection won't timeout because it is simply waiting to the user to do something with it.
 
 ---
 
@@ -589,7 +597,7 @@ The root path.
 <a name="server_getstream_putstream"></a>
 __GetStream and PutStream__
 
-When the `request` event is emitted, a new GetStream and PutStream instances are created. These streams are similar to the [streams](#client_getstream_putstream) used in the client but with one difference, the GetStream (`req`) acts like a "connection" object. All the events from the PutStream (`res`) are forwarded to the `req` object, so you don't need to attach any event to the `res` object.
+When the `request` event is emitted, a new GetStream and PutStream instances are created. These streams are similar to the [streams](#client_getstream_putstream) used in the client but with one difference, the GetStream (`req`) acts like a "connection" object. All the events from the PutStream (`res`) are forwarded to the `req` object, so you don't need to attach any event listener to the `res` object.
 
 The GetStream has two additional properties:
 
@@ -605,7 +613,7 @@ The PutStream has two additional methods:
 <a name="server_getstream_putstream_setsize"></a>
 - __setSize(size) : undefined__
 
-  Sets the size of the file to send. You need to call this method only with GET requests when you're using a custom request listener for the GET transfers, otherwise the request will just wait. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
+  Sets the size of the file to send. You need to call to this method only with GET requests when you're using a custom request listener, otherwise the request will just wait. Look at the examples [no-pipe.js](https://github.com/gagle/node-tftp/blob/master/examples/server/no-pipe.js) and [user-extensions-resume.js](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-resume.js) for more details.
 
 - __setUserExtensions(userExtensions) : undefined__
 
@@ -620,9 +628,9 @@ The PutStream has two additional methods:
 <a name="error_codes"></a>
 __Error codes__
 
-The following errors are used internally but they are exposed in case you need reuse any of them.
+The following errors are used internally but they are exposed in case you need to use any of them.
 
-The errors emitted by any `error` event of this module can contain a property named `code`. It has the name of the error.
+The errors emitted by any `error` event of this module can contain a property named `code`. It contains the name of the error, which is one of the following:
 
 _module_.ENOENT - File not found  
 _module_.EACCESS - Access violation  
