@@ -542,7 +542,7 @@ __error__
 
 Arguments: `error`.
 
-Emitted when an error occurs. The error is caused by a bad packet reception, so almost always, if the server emits an error, it is still alive accepting new requests. 
+Emitted when an error occurs. The error is mostly caused by a bad packet reception, so almost always, if the server emits an error, it is still alive accepting new requests. 
 
 <a name="server_event_listening"></a>
 __listening__

@@ -1,5 +1,14 @@
+v0.0.18 (18 Feb 2014)
+  Client: DNS lookup errors now return a descriptive message.
+  Server: The root directory is now validated when "listen()" is called.
+  Server: Better error handling in the default "requestListener".
+  Server: When a file is being PUTing, another file cannot GET it (ECURPUT), and
+    vice versa (ECURGET).
+  Bin: The "root" directory of the "--listen" option is now mandatory.
+  Bin: Minor bugfixes.
+
 v0.0.17 (08 Feb 2014)
-  The "abort" event doesn't emit any error.
+  Now the "abort" event doesn't return any error.
   Client: Removed "highWaterMark" option from all the functions. This option is
     in fact the "blockSize" option. The "highWaterMark" is only applicable in
     the other stream that pushes data to the PutStream, and is not very useful.

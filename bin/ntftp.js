@@ -56,7 +56,7 @@ var parseUri = function (uri){
     return this.fail (new Error ("The transfer mode must be 'octet'"));
   }
   return {
-    hostname: o.hostname,
+    host: o.host,
     port: o.port,
     file: arr[0]
   };
@@ -109,97 +109,106 @@ var normalizePutFiles = function (local, remote){
   };
 };
 
-var setMainParserOptions = function (body){
+var setMainOptions = function (body){
   //The default values are set inside the lib
   body
       .option ({ short: "b", long: "blksize", metavar: "SIZE",
-          type: Number, description: "Sets the blksize option. Valid range: " +
-          "[8, 65464]. Default is 1468, the size before IP fragmentation in " +
-          "Ethernet environments" })
+          type: Number, description: "Size of each data chunk. Valid range: " +
+          "[8, 65464]. Default is 1468, the MTU size before IP fragmentation " +
+          "in Ethernet networks" })
       .option ({ short: "r", long: "retries", metavar: "NUM",
           type: Number, description: "Number of retries before aborting the " +
           "file transfer due to an unresponsive server or a massive packet " +
           "loss" })
       .option ({ short: "t", long: "timeout", metavar: "MILLISECONDS",
-          type: Number, description: "Sets the timeout option. Default is " +
-          "3000ms" })
+          type: Number, description: "Milliseconds to wait before the next " +
+          "retry. Default is 3000ms" })
       .option ({ short: "w", long: "windowsize", metavar: "SIZE",
-          type: Number, description: "Sets the windowsize option. Valid " +
+          type: Number, description: "Size of the window. The window will " +
+          "send SIZE data chunks in a row before waiting for an ack. Valid " +
           "range: [1, 65535]. Default is 4" })
       .help ()
-};
-
-var setMainCommandBody = function (body){
-  body
-      .text ("RFC 3617 uri:")
-      .text ("tftp://<hostname>[:<port>]/<remote>[;mode=<transfer_mode>]\n",
-          "  ")
-      .text ("Transfer mode:")
-      .text ("The only supported mode is 'octet', that is, all the files are " +
-          "assumed to be binary files, therefore the content is not " +
-          "modified. Because the 'mode' parameter is optional it can just be " +
-          "ignored.", "  ")
 };
 
 //Removing the module from the cache is not necessary because a second instance
 //will be used during the whole program lifecycle
 var main = argp.createParser ()
     .main ()
-        .readPackage (__dirname + "/../package.json")
+        .allowUndefinedArguments ()
+        .readPackage (__dirname + "/../package.json", { email: false })
         .usages ([
           "ntftp [options] <host>[:<port>]",
           "ntftp get [options] <rfc3617_uri> [<local>]",
           "ntftp put [options] [<local>] <rfc3617_uri>",
         ])
-        .allowUndefinedArguments ()
         .on ("argument", function (argv, argument, ignore){
           if (argv.server) this.fail ("Too many arguments");
           argument = argument.split (":");
           argv.server = {
-            hostname: argument[0],
+            host: argument[0],
             port: argument[1]
           };
+          //Don't save the <host>[:port] argument
           ignore ();
         })
         .on ("end", function (argv){
           if (!argv.server) this.printHelp ();
-          if ("listen" in argv){
+          if (argv.listen){
             createServer (argv);
           }else{
             createClient (argv);
-            createPrompt ();
           }
         })
         .body ()
-            .text ("By default, the client sends known de facto extensions " +
-                "trying to achieve the best performance. If the server " +
-                "doesn't support these extensions, it automatically " +
+            .text ("By default, the client sends to the server some de facto " +
+                "extensions trying to achieve the best performance. If the " +
+                "server doesn't support these extensions, it automatically " +
                 "fallbacks to a pure RFC 1350 compliant TFTP client " +
-                "implementation.\n")
-            .text ("This utility can be used from a shell or with a command.")
-            .text ("\nShell:")
-            .text ("Arguments:", "  ")
+                "implementation.\n\n" +
+                
+                "This utility can be used with the built-in shell or " +
+                "directly with a command.\n\n" +
+                
+                "Shell:\n" +
+                "  Arguments:")
             .columns ("    <host>[:<port>]", "The address and port of the " +
-                "server, eg.\n$ ntftp localhost:1234.")
+                "server, e.g.\n$ ntftp localhost:1234")
             .text ("\nOnce the shell is running, it shows a prompt and " +
-                "recognizes the following commands:", "  ")
-            .text ("get, put.", "    ")
-            .text ("\n'<command> -h' for more information.", "  ")
-            .text ("\nTo quit the program press ctrl-c two times.", "  ")
-            .text ("\nExample:", "  ")
-            .text ("$ ntftp localhost -w 2 --blksize 256", "    ")
-            .text ("> get remote_file", "    ")
-            .text ("> get remote_file local_file", "    ")
-            .text ("> put path/to/local_file remote_file", "    ")
-            .text ("\nCommands:")
-            .text ("get, put.", "  ")
-            .text ("\n'ntftp <command> -h' for more information.", "  ")
-            .text ("\nTo start the server use the following option:")
+                "recognizes the following commands:\n" +
+                "  get, put.\n\n" +
+                
+                "'<command> -h' for more information.\n\n" +
+                
+                "To quit the program press ctrl-c two times.\n\n" +
+                
+                "Example:\n" +
+                "  $ ntftp localhost -w 2 --blksize 256\n" +
+                "  > get remote_file\n" +
+                "  > get remote_file local_file\n" +
+                "  > put path/to/local_file remote_file", "  ")
+            .text ("\nCommands:\n" +
+                "  get, put.\n\n" +
+                
+                "  'ntftp <command> -h' for more information.\n\n" +
+                
+                "To start a server use the following option:")
             .option ({ short: "l", long: "listen", metavar: "ROOT",
-                optional: true, description: "Starts the server. By default, " +
-                "the ROOT directory is '.', the current working directory." })
-            .text ("\nOptions:");
-setMainParserOptions (main);
+                description: "Starts the server. The ROOT is the directory " +
+                "from where the files are served" })
+            .text ("\nCommon options:");
+
+setMainOptions (main);
+
+var setCommandBody = function (body){
+  body
+      .text ("RFC 3617 uri:")
+      .text ("tftp://<host>[:<port>]/<remote>[;mode=<transfer_mode>]", "  ")
+      .text ("\nTransfer mode:")
+      .text ("The only supported mode is 'octet', that is, all the files are " +
+          "assumed to be binary files, therefore the content is not " +
+          "modified. Because the 'mode' parameter is optional it can just be " +
+          "ignored.", "  ")
+};
 
 var command = main
     .command ("get", { trailing: { min: 1, max: 2 } })
@@ -216,12 +225,11 @@ var command = main
           }
           
           argv.server = {
-            hostname: o.hostname,
+            host: o.host,
             port: o.port
           };
           
-          createClient (argv);
-          createPrompt (true);
+          createClient (argv, true);
           
           get (files.remote, files.local, function (error){
             if (error) notifyError (error);
@@ -229,14 +237,17 @@ var command = main
           });
         })
         .body ();
-setMainCommandBody (command);
+
+setCommandBody (command);
+
 command
     .text ("\nExample:")
-    .text ("$ ntftp get -w 2 tftp://localhost/file\n", "  ")
-    .text ("GETs a file named 'file' from the server in 'octet' mode with " +
-        "a window size of 2.", "    ")
+    .text ("$ ntftp get -w 2 tftp://localhost/file\n\n" +
+        "GETs a file named 'file' from the server in 'octet' mode with " +
+        "a window size of 2.", "  ")
     .text ("\nOptions:")
-setMainParserOptions (command);
+
+setMainOptions (command);
 
 var command = main
     .command ("put", { trailing: { min: 1, max: 2 } })
@@ -254,12 +265,11 @@ var command = main
           }
           
           argv.server = {
-            hostname: o.hostname,
+            host: o.host,
             port: o.port
           };
           
-          createClient (argv);
-          createPrompt (true);
+          createClient (argv, true);
           
           put (files.local, files.remote, function (error){
             if (error) notifyError (error);
@@ -267,13 +277,16 @@ var command = main
           });
         })
         .body ();
-setMainCommandBody (command);
+
+setCommandBody (command);
+
 command
     .text ("\nExample:")
-    .text ("$ ntftp put tftp://localhost/file\n", "  ")
-    .text ("PUTs a file named 'file' into the server in 'octet' mode.", "    ")
+    .text ("$ ntftp put tftp://localhost/file\n\n" +
+        "PUTs a file named 'file' into the server in 'octet' mode.", "  ")
     .text ("\nOptions:")
-setMainParserOptions (command);
+    
+setMainOptions (command);
 
 //Start parsing
 main.argv ();
@@ -281,12 +294,12 @@ main.argv ();
 //Free the parsers
 main = command = null;
 
-function createCommandParser (){
+function createShellParser (){
   return argp.createParser ()
       .main ()
           //Don't produce errors when undefined arguments and options are
-          //introduced, they are simply ignored because anyway if the end event
-          //is executed it will fail
+          //introduced, they are simply ignored because anyway, if the end event
+          //is executed, it will fail
           .allowUndefinedArguments ()
           .allowUndefinedOptions ()
           .on ("end", function (){
@@ -361,14 +374,12 @@ function createCommandParser (){
           .body ()
               .text ("Options:")
               .help ();
-  
-  return parser;
 };
 
 function createServer (argv){
   tftp.createServer ({
     root: argv.listen,
-    hostname: argv.server.hostname,
+    host: argv.server.host,
     port: argv.server.port,
     blockSize: argv.blksize,
     retries: argv.retries,
@@ -382,15 +393,17 @@ function createServer (argv){
   .listen ();
 };
 
-function createClient (argv){
+function createClient (argv, onlySigint){
   client = tftp.createClient ({
-    hostname: argv.server.hostname,
+    host: argv.server.host,
     port: argv.server.port,
     blockSize: argv.blksize,
     retries: argv.retries,
     timeout: argv.timeout,
     windowSize: argv.windowsize
   });
+  
+  createPrompt (onlySigint);
 };
 
 function createPrompt (onlySigint){
@@ -412,7 +425,7 @@ function createPrompt (onlySigint){
     return;
   }
 
-  var parser = createCommandParser ();
+  var parser = createShellParser ();
   
   var completions = ["get ", "put "];
   
