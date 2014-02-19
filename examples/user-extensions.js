@@ -17,7 +17,7 @@ var server = tftp.createServer (function (req, res){
   });
   
   res.setUserExtensions ({
-    num: parseFloat (req.stats.userExtensions.num) - 1
+    num: parseInt (req.stats.userExtensions.num) - 1
   });
   
   this.requestListener (req, res);
@@ -27,19 +27,23 @@ server.on ("error", function (error){
   console.error (error);
 });
 
+server.on ("listening", doRequest);
+
 server.listen ();
 
-fs.writeFileSync ("tmp1", "");
-console.log (">> 3");
+function doRequest (){
+  fs.writeFileSync ("tmp1", "");
+  console.log (">> 3");
 
-tftp.createClient ()
-    .createGetStream ("tmp1", { userExtensions: { num: 3 } })
-    .on ("stats", function (stats){
-      console.log ("<< " + stats.userExtensions.num);
-    })
-    .pipe (fs.createWriteStream ("tmp2"))
-    .on ("finish", function (){
-      server.close ();
-      fs.unlinkSync ("tmp1");
-      fs.unlinkSync ("tmp2");
-    });
+  tftp.createClient ()
+      .createGetStream ("tmp1", { userExtensions: { num: 3 } })
+      .on ("stats", function (stats){
+        console.log ("<< " + stats.userExtensions.num);
+      })
+      .pipe (fs.createWriteStream ("tmp2"))
+      .on ("finish", function (){
+        server.close ();
+        fs.unlinkSync ("tmp1");
+        fs.unlinkSync ("tmp2");
+      });
+}

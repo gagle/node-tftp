@@ -33,26 +33,31 @@ server.on ("error", function (error){
   console.error (error);
 });
 
+server.on ("listening", doRequest);
+
 server.listen ();
 
-var options = {
-  userExtensions: {
-    platform: "",
-    pid: ""
-  }
-};
 
-tftp.createClient ({ port: 1234 }).createGetStream ("hello", options)
-    .on ("error", function (error){
-      server.close ();
-      console.error (error);
-    })
-    .on ("stats", function (stats){
-      console.log ("TFTP server running on " + stats.userExtensions.platform +
-          " with pid " + stats.userExtensions.pid + ".");
-    })
-    .on ("end", function (){
-      server.close ();
-    })
-    //Hello World!
-    .pipe (process.stdout);
+function doRequest (){
+  var options = {
+    userExtensions: {
+      platform: "",
+      pid: ""
+    }
+  };
+
+  tftp.createClient ({ port: 1234 }).createGetStream ("hello", options)
+      .on ("error", function (error){
+        server.close ();
+        console.error (error);
+      })
+      .on ("stats", function (stats){
+        console.log ("TFTP server running on " + stats.userExtensions.platform +
+            " with pid " + stats.userExtensions.pid + ".");
+      })
+      .on ("end", function (){
+        server.close ();
+      })
+      //Hello World!
+      .pipe (process.stdout);
+}

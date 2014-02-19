@@ -30,27 +30,31 @@ server.on ("error", function (error){
   console.error (error);
 });
 
+server.on ("listening", doRequest);
+
 server.listen ();
 
-var clean = function (){
-  server.close ();
-  try{ fs.unlinkSync ("tmp1"); }catch (error){}
-  try{ fs.unlinkSync ("tmp2"); }catch (error){}
-};
+function doRequest (){
+  var clean = function (){
+    server.close ();
+    try{ fs.unlinkSync ("tmp1"); }catch (error){}
+    try{ fs.unlinkSync ("tmp2"); }catch (error){}
+  };
 
-fs.writeFileSync ("tmp1", "");
+  fs.writeFileSync ("tmp1", "");
 
-var client = tftp.createClient ();
-client.get ("tmp1", "tmp2", function (error){
-  //Invalid user
-  console.error (error);
-  
-  client.get ("tmp1", "tmp2", { userExtensions: {
-    user: "usr1",
-    pass: "usr1-pass"
-  }}, function (error){
-    clean ();
-    if (error) return console.error (error);
-    console.log ("OK");
+  var client = tftp.createClient ();
+  client.get ("tmp1", "tmp2", function (error){
+    //Invalid user
+    console.error (error);
+    
+    client.get ("tmp1", "tmp2", { userExtensions: {
+      user: "usr1",
+      pass: "usr1-pass"
+    }}, function (error){
+      clean ();
+      if (error) return console.error (error);
+      console.log ("OK");
+    });
   });
-});
+}

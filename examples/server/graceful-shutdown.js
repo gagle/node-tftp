@@ -32,8 +32,8 @@ server.on ("request", function (req){
   connections.push (req);
   
   //The "close" event is fired when the internal socket closes, regardless
-  //whether it is produced by an error, because the socket closes naturally
-  //due to the end of the transfer or because the transfer has been aborted
+  //whether it is produced by an error, the socket closes naturally due to the
+  //end of the transfer or the transfer has been aborted
   req.on ("close", function (){
     //Remove the connection
     connections.splice (connections.indexOf (this), 1);
