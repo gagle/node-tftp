@@ -6,9 +6,9 @@ var tftp = require ("../../lib");
 /*
 Note: Wrapping a GetStream or a PutStream in a function and use a fs.WriteStream
 as a destination or a fs.ReadStream as a source is not necessary. Use the
-functions client.get() and client.put(). This example only shows how to handle
-the errors and how to abort a transfer when you need to use the streams with
-other sources or destinations.
+functions client.get() and client.put() instead. This example only shows what is
+being done under the hood when using fs streams. For a simpler example with
+other kind of streams, see server/proxy-http.js
 */
 
 var client = tftp.createClient ();
