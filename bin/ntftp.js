@@ -388,7 +388,21 @@ function createServer (argv){
   })
   .on ("error", notifyError)
   .on ("request", function (req){
-    req.on ("error", notifyError);
+    console.log ("CONNECTION [" + req.stats.remoteAddress + ":" +
+        req.stats.remotePort + "] " + req.method + " " + req.file);
+    req.on ("error", function (error){
+      console.error ("ERROR [" + req.stats.remoteAddress + ":" +
+        req.stats.remotePort + "] " + req.method + " " + req.file + " - " +
+        error.message);
+    });
+    req.on ("close", function (){
+      console.log ("CLOSE [" + req.stats.remoteAddress + ":" +
+        req.stats.remotePort + "] " + req.method + " " + req.file);
+    });
+  })
+  .on ("listening", function (){
+    console.log ("Listening on " + this.host + ":" + this.port + " (root: '" +
+        path.resolve (this.root) + "')");
   })
   .listen ();
 };
@@ -532,10 +546,8 @@ function get (remote, local, cb){
           started = true;
           
           if (stats.size !== null){
-            bar = statusBar.create ({
-              total: stats.size,
-              render: renderStatusBar
-            });
+            bar = statusBar.create ({ total: stats.size })
+                .on ("render", renderStatusBar)
             this.pipe (bar);
           }else{
             //The server doesn't support extensions
@@ -592,10 +604,8 @@ function put (local, remote, cb){
     
     filename = formatFilename (local);
     
-    var bar = statusBar.create ({
-      total: stats.size,
-      render: renderStatusBar
-    });
+    var bar = statusBar.create ({ total: stats.size })
+        .on ("render", renderStatusBar)
     
     write = {};
     

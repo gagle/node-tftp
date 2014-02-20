@@ -1,7 +1,4 @@
 CHANGES
 examples
-.npmignore
-
 test
-t.js
-todo
+.npmignore

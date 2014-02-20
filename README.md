@@ -8,10 +8,6 @@ tftp
 
 [![NPM installation](https://nodei.co/npm/tftp.png?mini=true)](https://nodei.co/npm/tftp "NodeICO Badge")
 
-### WARNING ###
-
-The implementation it's already done, you can GET and PUT files correctly. However, some optimizations must still be done, so for your safety don't use it in production or development, just for testing purposes. It will be ready when it reaches the version 0.1.0.
-
 ---
 
 Full-featured streaming TFTP client and server. It supports most of the RFCs:
@@ -468,7 +464,7 @@ $ ntftp [options] <host>[:<port>] -l|--listen=ROOT
 For example:
 
 ```
-$ ntftp localhost -l
+$ ntftp localhost -l .
 ```
 
 This command starts a server listening on `localhost:69` and root `.`.
@@ -524,6 +520,8 @@ __Methods__
 
 __Properties__
 
+- [host](#server_host)
+- [port](#server_port)
 - [root](#server_root)
 
 [__Error codes__](#server_errors)
@@ -584,6 +582,20 @@ Starts accepting new connections.
 __requestListener(req, res) : undefined__
 
 This function must NOT be called from outside a `request` listener. This function is the default request listener, it automatically handles the GET and PUT requests.
+
+---
+
+<a name="server_host"></a>
+__host__
+
+The address that the server is listening to.
+
+---
+
+<a name="server_port"></a>
+__port__
+
+The port that the server is listening to.
 
 ---
 

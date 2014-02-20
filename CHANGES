@@ -1,3 +1,8 @@
+v0.1.0 (20 Feb 2014)
+  Server: Added "host" and "port" public properties.
+  Bin: Improved server logging messages.
+  Bin: Updated status-bar dependency.
+
 v0.0.18 (18 Feb 2014)
   Client: DNS lookup errors now return a descriptive message.
   Server: The root directory is now validated when "listen()" is called.
