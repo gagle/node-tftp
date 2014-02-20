@@ -8,8 +8,6 @@ tftp
 
 [![NPM installation](https://nodei.co/npm/tftp.png?mini=true)](https://nodei.co/npm/tftp "NodeICO Badge")
 
----
-
 Full-featured streaming TFTP client and server. It supports most of the RFCs:
 
 - [1350 - The TFTP protocol](http://www.ietf.org/rfc/rfc1350.txt) ✓
