@@ -661,6 +661,6 @@ _module_.EIO - I/O error
 _module_.ENOGET - Cannot GET files  
 _module_.ENOPUT - Cannot PUT files  
 _module_.ERBIG - Request bigger than 512 bytes  
-_module_.ECONPUT - Concurrent PUT request over the same file
-_module_.ECURPUT - The requested file is being written by another request
+_module_.ECONPUT - Concurrent PUT request over the same file  
+_module_.ECURPUT - The requested file is being written by another request  
 _module_.ECURGET - The requested file is being read by another request
