@@ -636,7 +636,7 @@ The PutStream has two additional methods:
 ---
 
 <a name="error_codes"></a>
-__Error codes__
+### Error codes ###
 
 The following errors are used internally but they are exposed in case you need to use any of them.
 
