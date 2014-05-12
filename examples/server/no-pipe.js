@@ -4,8 +4,7 @@ var fs = require ("fs");
 var tftp = require ("../../lib");
 
 /*
-You don't need to pipe from the a file, the response it's just a writable
-stream.
+You don't need to pipe from a file, the response it's just a writable stream.
 */
 
 var server = tftp.createServer ({
