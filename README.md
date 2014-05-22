@@ -231,7 +231,7 @@ Options:
 - __sha1__ - _String_  
   SHA1 sum for validating the integrity of the file.
 - __userExtensions__ - _Object_  
-  Custom extensions to send with the request. [More information](#client).
+  Custom extensions to send with the request. [More information](#client_object).
 
 ```javascript
 var get = client.createGetStream ("file");
