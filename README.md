@@ -1,7 +1,7 @@
 tftp
 ====
 
-#### Streaming TFTP client and Server ####
+#### Streaming TFTP client and server ####
 
 [![NPM version](https://badge.fury.io/js/tftp.png)](http://badge.fury.io/js/tftp "Fury Version Badge")
 [![Dependency Status](https://david-dm.org/gagle/node-tftp.png)](https://david-dm.org/gagle/node-tftp "David Dependency Manager Badge")
@@ -68,7 +68,7 @@ __Streams__
 
 For the sake of simplicity the following examples omit the error handling. See the [streams.js](https://github.com/gagle/node-tftp/blob/master/examples/client/streams.js) example or the [source code](https://github.com/gagle/node-tftp/blob/master/lib/client.js) of the [get()](#client-get) and [put()](#client-put) functions for more information.
 
-__GET remote → local__
+__GET remote > local__
 
 ```javascript
 var get = client.createGetStream ("remote-file");
@@ -77,7 +77,7 @@ var write = fs.createWriteStream ("local-file");
 get.pipe (write);
 ```
 
-__PUT local → remote__
+__PUT local > remote__
 
 ```javascript
 var read = fs.createReadStream ("local-file");
@@ -158,17 +158,17 @@ var client = tftp.createClient ({
 
 Options:
 
-- __host__ - _String_  
+- __host__ - _String_
   The address. Both IPv4 and IPv6 are allowed as well as a domain name. Default is `localhost` (`127.0.0.1`).
-- __port__ - _Number_  
+- __port__ - _Number_
   The port. Default is 69.
-- __blockSize__ - _Number_  
+- __blockSize__ - _Number_
   The size of the DATA blocks. Valid range: [8, 65464]. Default is 1468, the MTU size before IP fragmentation in Ethernet networks.
-- __windowSize__ - _Number_  
+- __windowSize__ - _Number_
   The size of each window. The window size means the number of blocks that can be sent/received without waiting an acknowledgement. Valid range: [1, 65535]. Default is 4.
 
   Comparison of transfer times:
-  
+
   <table>
     <tr><th>Window size</th><th>Improvement</th></tr>
     <tr><td>1</td><td>-0%</td></tr>
@@ -178,15 +178,15 @@ Options:
     <tr><td>5</td><td>-73%</td></tr>
     <tr><td>6</td><td>-76%</td></tr>
   </table>
-  
+
   Take into account that with a bigger window more elements must be reordered (remember that UDP doesn't reorder the incoming packets). This doesn't slow down the transfer speed very much but it requires more CPU. A window size of 4 is a good trade between transfer speed and CPU usage.
-  
+
   Right now a window size of 6 is the maximum in Windows due to the [packet loss](#udploss) issue. With a window size of 7 or greater a lot of timeouts and retransmissions begin to occur, so the recommendation is to use a window size of 4, the default value.
-- __retries__ - _Number_  
+- __retries__ - _Number_
   How many retries must be done before emitting an error. Default is 3.
-- __timeout__ - _Number_  
+- __timeout__ - _Number_
   Milliseconds to wait before a retry. Default is 3000.
-  
+
 ---
 
 <a name="client_object"></a>
@@ -207,9 +207,9 @@ client.put ("file", options, function (){ ... });
 client.createGetStream ("file", options);
 client.createPutStream ("file", options);
 ```
-  
+
 The server may ignore or not these extensions. This feature is server-dependent. Please note that the TFTP algorithm cannot be modified. For example, you can implement a basic authentication; the client could send the extensions `user` and `password` and the server could validate the user and accept or deny the request. The extensions are transmitted in plain text.
-  
+
 The extensions `timeout`, `tsize`, `blksize`, `windowsize` and `rollover` are reserved and cannot be used.
 
 __Methods__
@@ -226,11 +226,11 @@ Returns a new [GetStream](#client_getstream_putstream) instance.
 
 Options:
 
-- __md5__ - _String_  
+- __md5__ - _String_
   MD5 sum for validating the integrity of the file.
-- __sha1__ - _String_  
+- __sha1__ - _String_
   SHA1 sum for validating the integrity of the file.
-- __userExtensions__ - _Object_  
+- __userExtensions__ - _Object_
   Custom extensions to send with the request. [More information](#client_object).
 
 ```javascript
@@ -244,9 +244,9 @@ Returns a new [PutStream](#client_getstream_putstream) instance.
 
 Options:
 
-- __size__ - _String_  
+- __size__ - _String_
   Total size of the file to upload. This option is required.
-- __userExtensions__ - _Object_  
+- __userExtensions__ - _Object_
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
@@ -260,11 +260,11 @@ Downloads a file from the server. If the local filename is missing, the basename
 
 Options:
 
-- __md5__ - _String_  
+- __md5__ - _String_
   MD5 sum for validating the integrity of the file.
-- __sha1__ - _String_  
+- __sha1__ - _String_
   SHA1 sum for validating the integrity of the file.
-- __userExtensions__ - _Object_  
+- __userExtensions__ - _Object_
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
@@ -282,7 +282,7 @@ Uploads a file to the server. If the remote filename is missing the basename of 
 
 Options:
 
-- __userExtensions__ - _Object_  
+- __userExtensions__ - _Object_
   Custom extensions to send with the request. [More information](#client).
 
 ```javascript
@@ -335,7 +335,7 @@ __end__
 
 Arguments: none.
 
-Emitted by the GetStream when the file download finishes. 
+Emitted by the GetStream when the file download finishes.
 
 <a name="client_event_error"></a>
 __error__
@@ -349,7 +349,7 @@ __finish__
 
 Arguments: none.
 
-Emitted by the PutStream when the file upload finishes. 
+Emitted by the PutStream when the file upload finishes.
 
 <a name="client_event_stats"></a>
 __stats__
@@ -489,11 +489,11 @@ Options:
 
 It has the same options as the [createClient()](#createclient) function with the addition of:
 
-- __root__ - _String_  
+- __root__ - _String_
   The root directory. Default is `.`.
-- __denyGET__ - _Boolean_  
+- __denyGET__ - _Boolean_
   Denies all the GET operations. Default is false.
-- __denyPUT__ - _Boolean_  
+- __denyPUT__ - _Boolean_
   Denies all the PUT operations. Default is false.
 
 Setting the options `denyGET` or `denyPUT` is more efficient than aborting the request from inside the request listener.
@@ -538,7 +538,7 @@ __error__
 
 Arguments: `error`.
 
-Emitted when an error occurs. The error is mostly caused by a bad packet reception, so almost always, if the server emits an error, it is still alive accepting new requests. 
+Emitted when an error occurs. The error is mostly caused by a bad packet reception, so almost always, if the server emits an error, it is still alive accepting new requests.
 
 <a name="server_event_listening"></a>
 __listening__
@@ -611,11 +611,11 @@ When the `request` event is emitted, a new GetStream and PutStream instances are
 
 The GetStream has two additional properties:
 
-- __file__ - _String_  
+- __file__ - _String_
   The path of the file. The directories are not created recursively if they don't exist.
-- __method__ - _String_  
+- __method__ - _String_
   The transfer's method: `GET` or `PUT`.
-- __stats__ - _Object_  
+- __stats__ - _Object_
   An object holding some stats from the current request. [More information](#client_event_stats).
 
 The PutStream has two additional methods:
@@ -628,9 +628,9 @@ The PutStream has two additional methods:
 - __setUserExtensions(userExtensions) : undefined__
 
   Sets the user extensions to send back to the client in response to the received ones. You cannot send extensions different from the ones that are sent by the client. This method must be called before [setSize()](#server_getstream_putstream_setsize).
-  
+
   As said previously, the TFTP protocol doesn't have any built-in authentication mechanism but thanks to the user extensions you can implement a simple authentication as showed [here](https://github.com/gagle/node-tftp/blob/master/examples/user-extensions-authentication.js).
-  
+
   Look at the [examples](https://github.com/gagle/node-tftp/tree/master/examples) for more details.
 
 ---
@@ -642,25 +642,25 @@ The following errors are used internally but they are exposed in case you need t
 
 The errors emitted by any `error` event of this module can contain a property named `code`. It contains the name of the error, which is one of the following:
 
-_module_.ENOENT - File not found  
-_module_.EACCESS - Access violation  
-_module_.ENOSPC - Disk full or allocation exceeded  
-_module_.EBADOP - Illegal TFTP operation  
-_module_.ETID - Unknown transfer ID  
-_module_.EEXIST - File already exists  
-_module_.ENOUSER - No such user  
-_module_.EDENY - The request has been denied  
-_module_.ESOCKET - Invalid remote socket  
-_module_.EBADMSG - Malformed TFTP message  
-_module_.EABORT - Aborted  
-_module_.EFBIG - File too big  
-_module_.ETIME - Timed out  
-_module_.EBADMODE - Invalid transfer mode  
-_module_.EBADNAME - Invalid filename  
-_module_.EIO - I/O error  
-_module_.ENOGET - Cannot GET files  
-_module_.ENOPUT - Cannot PUT files  
-_module_.ERBIG - Request bigger than 512 bytes  
-_module_.ECONPUT - Concurrent PUT request over the same file  
-_module_.ECURPUT - The requested file is being written by another request  
+_module_.ENOENT - File not found
+_module_.EACCESS - Access violation
+_module_.ENOSPC - Disk full or allocation exceeded
+_module_.EBADOP - Illegal TFTP operation
+_module_.ETID - Unknown transfer ID
+_module_.EEXIST - File already exists
+_module_.ENOUSER - No such user
+_module_.EDENY - The request has been denied
+_module_.ESOCKET - Invalid remote socket
+_module_.EBADMSG - Malformed TFTP message
+_module_.EABORT - Aborted
+_module_.EFBIG - File too big
+_module_.ETIME - Timed out
+_module_.EBADMODE - Invalid transfer mode
+_module_.EBADNAME - Invalid filename
+_module_.EIO - I/O error
+_module_.ENOGET - Cannot GET files
+_module_.ENOPUT - Cannot PUT files
+_module_.ERBIG - Request bigger than 512 bytes
+_module_.ECONPUT - Concurrent PUT request over the same file
+_module_.ECURPUT - The requested file is being written by another request
 _module_.ECURGET - The requested file is being read by another request
