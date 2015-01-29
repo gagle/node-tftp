@@ -16,7 +16,7 @@ Full-featured streaming TFTP client and server. It supports most of the RFCs:
 - [2349 - Timeout Interval and Transfer Size Options](http://www.ietf.org/rfc/rfc2349.txt) ✓
 - [2090 - Multicast option](http://www.ietf.org/rfc/rfc2090.txt) ✗
 - [3617 - Uniform Resource Identifier (URI)](http://www.ietf.org/rfc/rfc3617.txt) ✓
-- [De facto (draft) - Windowsize option](http://www.ietf.org/id/draft-masotta-tftpexts-windowsize-opt-08.txt) ✓
+- [7440 - Windowsize option](https://tools.ietf.org/rfc/rfc7440.txt) ✓
 - [De facto - Rollover option](http://www.compuphase.com/tftp.htm) ✓
 - `mail` and `netascii` transfer modes ✗
 

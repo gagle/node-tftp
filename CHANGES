@@ -1,110 +1,110 @@
 v0.1.0 (20 Feb 2014)
-  Server: Added "host" and "port" public properties.
-  Bin: Improved server logging messages.
-  Bin: Updated status-bar dependency.
+	Server: Added "host" and "port" public properties.
+	Bin: Improved server logging messages.
+	Bin: Updated status-bar dependency.
 
 v0.0.18 (18 Feb 2014)
-  Client: DNS lookup errors now return a descriptive message.
-  Server: The root directory is now validated when "listen()" is called.
-  Server: Better error handling in the default "requestListener".
-  Server: When a file is being PUTing, another file cannot GET it (ECURPUT), and
-    vice versa (ECURGET).
-  Bin: The "root" directory of the "--listen" option is now mandatory.
-  Bin: Minor bugfixes.
+	Client: DNS lookup errors now return a descriptive message.
+	Server: The root directory is now validated when "listen()" is called.
+	Server: Better error handling in the default "requestListener".
+	Server: When a file is being PUTing, another file cannot GET it (ECURPUT), and
+		vice versa (ECURGET).
+	Bin: The "root" directory of the "--listen" option is now mandatory.
+	Bin: Minor bugfixes.
 
 v0.0.17 (08 Feb 2014)
-  Now the "abort" event doesn't return any error.
-  Client: Removed "highWaterMark" option from all the functions. This option is
-    in fact the "blockSize" option. The "highWaterMark" is only applicable in
-    the other stream that pushes data to the PutStream, and is not very useful.
-  Client: Convert the md5 and sha1 sums to lower case before comparing.
-  Client: Renamed "md5sum" and "sha1sum" options to "md5" and "sha1".
+	Now the "abort" event doesn't return any error.
+	Client: Removed "highWaterMark" option from all the functions. This option is
+		in fact the "blockSize" option. The "highWaterMark" is only applicable in
+		the other stream that pushes data to the PutStream, and is not very useful.
+	Client: Convert the md5 and sha1 sums to lower case before comparing.
+	Client: Renamed "md5sum" and "sha1sum" options to "md5" and "sha1".
 
 v0.0.16 (05 Feb 2014)
-  Server: Major internal refactor. The only noticable change in the public API
-    is the removal of the "stats" event in favor of a "stats" object attached to
-    the "req" parameter. This is a way more simpler to use the API because now
-    you have immediate access to the socket (ie. logging purposes).
-  Removed the "file" property from the "stats" object.
-  The "userExtensions" now defaults to an empty object instead of null.
-  Server: Minor bugfixes and improvements.
+	Server: Major internal refactor. The only noticable change in the public API
+		is the removal of the "stats" event in favor of a "stats" object attached to
+		the "req" parameter. This is a way more simpler to use the API because now
+		you have immediate access to the socket (ie. logging purposes).
+	Removed the "file" property from the "stats" object.
+	The "userExtensions" now defaults to an empty object instead of null.
+	Server: Minor bugfixes and improvements.
 
 v0.0.15 (28 Jan 2014)
-  Client: Fixed "put()".
+	Client: Fixed "put()".
 
 v0.0.14 (27 Jan 2014)
-  Server: Added minor validations.
-  Server: Minor bugfixes.
-  Added "close()".
-  
+	Server: Added minor validations.
+	Server: Minor bugfixes.
+	Added "close()".
+	
 v0.0.13 (26 Jan 2014)
-  Server: Deny concurrent PUT requests over the same file.
-  Server: The "stats" event is now emitted in a future tick. This allows to
-    call the default request listener after the "stats" event and allows to
-    create the stream chaining based on the values of the "stats" object.
-  Server: Added "setSize()". It must be used with custom request listeners to
-    set the size of the response when is a GET request.
-  Better maximum size error handling.
-  Server: Exposed error codes.
-  Server: Now the server doesn't check for initial errors. As soon as a new
-    request starts, it creates the streams and emits the "request" event.
-  Minor improvements.
+	Server: Deny concurrent PUT requests over the same file.
+	Server: The "stats" event is now emitted in a future tick. This allows to
+		call the default request listener after the "stats" event and allows to
+		create the stream chaining based on the values of the "stats" object.
+	Server: Added "setSize()". It must be used with custom request listeners to
+		set the size of the response when is a GET request.
+	Better maximum size error handling.
+	Server: Exposed error codes.
+	Server: Now the server doesn't check for initial errors. As soon as a new
+		request starts, it creates the streams and emits the "request" event.
+	Minor improvements.
 
 v0.0.12 (24 Jan 2014)
-  Client: Fixed put stream error handling with empty files.
-  Client: Improved maximum size error handling.
-  Improved the error checking with DATA and ACK packets.
+	Client: Fixed put stream error handling with empty files.
+	Client: Improved maximum size error handling.
+	Improved the error checking with DATA and ACK packets.
 
 v0.0.11 (23 Jan 2014)
-  Server: Fixed IPv6 socket.
+	Server: Fixed IPv6 socket.
 
 v0.0.10 (22 Jan 2014)
-  Allowed error messages with code 0 and no description.
+	Allowed error messages with code 0 and no description.
 
 v0.0.9 (21 Jan 2014)
-  Client: Added DNS address resolution.
-  Added automatic UDP socket type creation (IPv4 or IPv6).
-  Renamed "hostname" option to "host".
-  Server: When the request is a PUT operation "setUserExtensions()" works
-    correctly.
+	Client: Added DNS address resolution.
+	Added automatic UDP socket type creation (IPv4 or IPv6).
+	Renamed "hostname" option to "host".
+	Server: When the request is a PUT operation "setUserExtensions()" works
+		correctly.
 
 v0.0.8 (21 Jan 2014)
-  Server: Allowed aborting a request without calling the default request
-    listener.
-  Minor internal refactor.
+	Server: Allowed aborting a request without calling the default request
+		listener.
+	Minor internal refactor.
 
 v0.0.7 (20 Jan 2014)
-  Bump version.
+	Bump version.
 
 v0.0.6 (20 Jan 2014)
-  Server implemented along with a major refactor of the client.
-  Fixed the reception of user extensions sent by the server.
-  Added the server setup in the cli script.
-  Changed the sockets of the stats object.
-  Minor tweaks, checks and bugfixes.
+	Server implemented along with a major refactor of the client.
+	Fixed the reception of user extensions sent by the server.
+	Added the server setup in the cli script.
+	Changed the sockets of the stats object.
+	Minor tweaks, checks and bugfixes.
 
 v0.0.5 (16 Jan 2014)
-  An error message can be passed to "abort()". This is an informative message
-    that is sent to the server.
-  Minor bugfixes.
+	An error message can be passed to "abort()". This is an informative message
+		that is sent to the server.
+	Minor bugfixes.
 
 v0.0.4 (13 Jan 2014)
-  Added "highWaterMark" option to "get()", "put()", "createGetStream()" and
-    "createPutStream()".
+	Added "highWaterMark" option to "get()", "put()", "createGetStream()" and
+		"createPutStream()".
 
 v0.0.3 (11 Jan 2014)
-  If the server sends unknown extensions now the client fails correctly.
-  The "userExtensions" property has been moved from "createClient()" to "get()",
-    "put()", "createGetStream()" and "createPutStream()".
-  Fixed error while retransmitting a bad request.
-  Properly check if the file is too big to be sent.
-  Minor improvements.
+	If the server sends unknown extensions now the client fails correctly.
+	The "userExtensions" property has been moved from "createClient()" to "get()",
+		"put()", "createGetStream()" and "createPutStream()".
+	Fixed error while retransmitting a bad request.
+	Properly check if the file is too big to be sent.
+	Minor improvements.
 
 v0.0.2 (06 Jan 2014)
-  Fixed error with the sums.
-  Don't wait to the callback after sending a packet.
-  The reader and the writer inherites from the request instead of using events.
-  Speed improvement (~25% faster).
+	Fixed error with the sums.
+	Don't wait to the callback after sending a packet.
+	The reader and the writer inherites from the request instead of using events.
+	Speed improvement (~25% faster).
 
 v0.0.1 (05 Jan 2014)
-  First release.
+	First release.

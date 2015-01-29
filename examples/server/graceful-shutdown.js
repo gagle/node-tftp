@@ -23,30 +23,30 @@ var connections = [];
 var server = tftp.createServer ();
 
 server.on ("request", function (req){
-  req.on ("error", function (error){
-    //Error from the request
-    console.error (error);
-  });
-  
-  //Save the connection
-  connections.push (req);
-  
-  //The "close" event is fired when the internal socket closes, regardless
-  //whether it is produced by an error, the socket closes naturally due to the
-  //end of the transfer or the transfer has been aborted
-  req.on ("close", function (){
-    //Remove the connection
-    connections.splice (connections.indexOf (this), 1);
-    if (closed && !connections.length){
-      //The server and all the connections have been closed
-      console.log ("Server closed");
-    }
-  });
+	req.on ("error", function (error){
+		//Error from the request
+		console.error (error);
+	});
+	
+	//Save the connection
+	connections.push (req);
+	
+	//The "close" event is fired when the internal socket closes, regardless
+	//whether it is produced by an error, the socket closes naturally due to the
+	//end of the transfer or the transfer has been aborted
+	req.on ("close", function (){
+		//Remove the connection
+		connections.splice (connections.indexOf (this), 1);
+		if (closed && !connections.length){
+			//The server and all the connections have been closed
+			console.log ("Server closed");
+		}
+	});
 });
 
 server.on ("error", function (error){
-  //Errors from the main socket
-  console.error (error);
+	//Errors from the main socket
+	console.error (error);
 });
 
 server.listen ();
@@ -54,19 +54,19 @@ server.listen ();
 var closed = false;
 
 setTimeout (function (){
-  //Close the server after 10s
-  server.on ("close", function (){
-    closed = true;
-    
-    if (!connections.length){
-      return console.log ("Server closed");
-    }
-    
-    //Abort all the current transfers
-    for (var i=0; i<connections.length; i++){
-      console.log ("Connection " + i + " aborted");
-      connections[i].abort ();
-    }
-  });
-  server.close ();
+	//Close the server after 10s
+	server.on ("close", function (){
+		closed = true;
+		
+		if (!connections.length){
+			return console.log ("Server closed");
+		}
+		
+		//Abort all the current transfers
+		for (var i=0; i<connections.length; i++){
+			console.log ("Connection " + i + " aborted");
+			connections[i].abort ();
+		}
+	});
+	server.close ();
 }, 10000);
