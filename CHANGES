@@ -1,3 +1,6 @@
+v0.1.1 (03 Apr 2015)
+	Fixed bug in "abort()".
+
 v0.1.0 (20 Feb 2014)
 	Server: Added "host" and "port" public properties.
 	Bin: Improved server logging messages.
@@ -36,7 +39,7 @@ v0.0.14 (27 Jan 2014)
 	Server: Added minor validations.
 	Server: Minor bugfixes.
 	Added "close()".
-	
+
 v0.0.13 (26 Jan 2014)
 	Server: Deny concurrent PUT requests over the same file.
 	Server: The "stats" event is now emitted in a future tick. This allows to
