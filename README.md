@@ -642,25 +642,25 @@ The following errors are used internally but they are exposed in case you need t
 
 The errors emitted by any `error` event of this module can contain a property named `code`. It contains the name of the error, which is one of the following:
 
-_module_.ENOENT - File not found
-_module_.EACCESS - Access violation
-_module_.ENOSPC - Disk full or allocation exceeded
-_module_.EBADOP - Illegal TFTP operation
-_module_.ETID - Unknown transfer ID
-_module_.EEXIST - File already exists
-_module_.ENOUSER - No such user
-_module_.EDENY - The request has been denied
-_module_.ESOCKET - Invalid remote socket
-_module_.EBADMSG - Malformed TFTP message
-_module_.EABORT - Aborted
-_module_.EFBIG - File too big
-_module_.ETIME - Timed out
-_module_.EBADMODE - Invalid transfer mode
-_module_.EBADNAME - Invalid filename
-_module_.EIO - I/O error
-_module_.ENOGET - Cannot GET files
-_module_.ENOPUT - Cannot PUT files
-_module_.ERBIG - Request bigger than 512 bytes
-_module_.ECONPUT - Concurrent PUT request over the same file
-_module_.ECURPUT - The requested file is being written by another request
-_module_.ECURGET - The requested file is being read by another request
+* _module_.ENOENT - File not found
+* _module_.EACCESS - Access violation
+* _module_.ENOSPC - Disk full or allocation exceeded
+* _module_.EBADOP - Illegal TFTP operation
+* _module_.ETID - Unknown transfer ID
+* _module_.EEXIST - File already exists
+* _module_.ENOUSER - No such user
+* _module_.EDENY - The request has been denied
+* _module_.ESOCKET - Invalid remote socket
+* _module_.EBADMSG - Malformed TFTP message
+* _module_.EABORT - Aborted
+* _module_.EFBIG - File too big
+* _module_.ETIME - Timed out
+* _module_.EBADMODE - Invalid transfer mode
+* _module_.EBADNAME - Invalid filename
+* _module_.EIO - I/O error
+* _module_.ENOGET - Cannot GET files
+* _module_.ENOPUT - Cannot PUT files
+* _module_.ERBIG - Request bigger than 512 bytes
+* _module_.ECONPUT - Concurrent PUT request over the same file
+* _module_.ECURPUT - The requested file is being written by another request
+* _module_.ECURGET - The requested file is being read by another request
